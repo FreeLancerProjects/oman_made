@@ -51,6 +51,8 @@
     <string name="legal">Legal</string>
     <string name="privacy_policy">Privacy Policy</string>
     <string name="rate_us">Rate Us</string>
+    <string name="keyword">Keyword</string>
+    <string name="search2">Search</string>
 
 
 </resources>

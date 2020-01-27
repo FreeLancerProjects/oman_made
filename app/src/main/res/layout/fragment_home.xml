@@ -3,15 +3,156 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:orientation="vertical"
+        android:fitsSystemWindows="true"
+        android:fillViewport="true"
         android:background="@drawable/bg"
+
         >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <androidx.viewpager.widget.ViewPager
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="10dp"
+
+                />
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:tabGravity="fill"
+                app:tabMode="scrollable"
+                app:tabIndicatorHeight="0dp"
+
+                />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                app:contentPadding="5dp"
+                app:cardElevation="3dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/white"
+                android:layout_marginBottom="5dp"
+
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="4"
+                    >
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/spinner_bg"
+                        >
+
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/white"
+                            android:hint="@string/keyword"
+                            android:textColorHint="@color/gray5"
+                            android:paddingLeft="2dp"
+                            android:paddingRight="2dp"
+                            android:gravity="center"
+                            android:textSize="12sp"
+                            android:lines="1"
+                            android:textColor="@color/black"
+                            android:layout_margin="2dp"
+
+                            />
+
+                    </FrameLayout>
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="2dp"/>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/spinner_bg"
+                        >
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+
+                            />
+                    </FrameLayout>
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="2dp"/>
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/spinner_bg"
+                        >
+                        <Spinner
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+
+                            />
+                    </FrameLayout>
+
+                    <Button
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:text="@string/search2"
+                        android:background="@drawable/btn_search"
+                        android:layout_margin="3dp"
+                        />
 
 
-    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-15dp"
+                android:background="@color/white"
+                android:paddingTop="20dp"
+
+
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recViewSponsor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    />
+                <ProgressBar
+                    android:id="@+id/progBarSponsor"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </layout>

@@ -58,6 +58,8 @@
     <string name="legal">شروط الاستخدام</string>
     <string name="privacy_policy">سياسة الخصوصية</string>
     <string name="rate_us">قيم التطبيق</string>
+    <string name="keyword">بحث..</string>
+    <string name="search2">بحث</string>
 
 
 </resources>
