@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">عمان ميد</string>
+    <string name="map_api_key">AIzaSyCbc2Y5AIwZ8uUeHRUXiozGN3CnpjKT0oI</string>
+
+    <string name="navigation_drawer_open">فتح</string>
+    <string name="navigation_drawer_close">إغلاق</string>
+
+    <string name="home">الرئيسية</string>
+    <string name="notifications">الاشعارات</string>
+    <string name="more">المزيد</string>
+    <string name="terms_and_conditions">الشروط والاحكام</string>
+    <string name="about_app">عن التطبيق</string>
+    <string name="contact_us">اتصل بنا</string>
+
+
+
+    <string name="back">رجوع</string>
+    <string name="failed">فشل حاول مرة اخرى لاحقا</string>
+    <string name="something">تحقق من الاتصال بالانترنت</string>
+
+    <string name="language_settings">إعدادات اللغة</string>
+    <string name="sar">ر.س</string>
+    <string name="no_details">لا توجد تفاصيل</string>
+    <string name="cancel">إلغاء</string>
+    <string name="suc">تم بنجاح</string>
+
+
+
+
+
+
+    <string name="call">اتصال</string>
+
+    <string name="share">مشاركة</string>
+    <string name="edit">تعديل</string>
+    <string name="price">سعر</string>
+    <string name="delete">حذف</string>
+
+    <string name="change_language">تغير اللغة</string>
+
+    <string name="detials">تفاصيل</string>
+
+    <string name="send">إرسال</string>
+    <string name="ok">حسنا!</string>
+    <string name="directory">الدليل</string>
+    <string name="indus_Area">المنطقة الصناعية</string>
+    <string name="spons">كفيل</string>
+    <string name="no_data_to_show">لاتوجد عناصر لعرضها</string>
+    <string name="create_new_listing">إنشاء مؤسسة</string>
+    <string name="profile">حسابي</string>
+    <string name="catalogue">المعرض</string>
+    <string name="services">خدمات</string>
+    <string name="packages">باقات</string>
+    <string name="peie">المؤسسة العامة للمناطق الصناعية</string>
+    <string name="support">الدعم</string>
+    <string name="faq">الاسئلة الشائعة</string>
+    <string name="app_settings">إعدادات التطبيق</string>
+    <string name="legal">شروط الاستخدام</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="rate_us">قيم التطبيق</string>
+
+
+</resources>

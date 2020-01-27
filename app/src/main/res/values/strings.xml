@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Oman Made</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="map_api_key">AIzaSyCbc2Y5AIwZ8uUeHRUXiozGN3CnpjKT0oI</string>
+
+    <string name="home">Home</string>
+    <string name="notifications">Notifications</string>
+    <string name="more">More</string>
+    <string name="terms_and_conditions">Terms of use</string>
+    <string name="about_app">About Us</string>
+    <string name="contact_us">Contact Us</string>
+
+
+    <string name="back">Back</string>
+    <string name="failed">Failed</string>
+    <string name="something">Check internet connection</string>
+
+    <string name="language_settings">Language Settings</string>
+    <string name="sar">SAR</string>
+    <string name="no_details">No details</string>
+    <string name="cancel">Cancel</string>
+    <string name="suc">Success !</string>
+
+
+    <string name="call">Call</string>
+    <string name="share">share</string>
+    <string name="edit">Edit</string>
+    <string name="price">Price</string>
+    <string name="delete">Delete</string>
+    <string name="change_language">Change language</string>
+    <string name="detials">Details</string>
+
+
+    <string name="send">Send</string>
+    <string name="ok">ok</string>
+    <string name="directory">Directory</string>
+    <string name="indus_Area">Industrial Area</string>
+    <string name="spons">Sponsor</string>
+    <string name="no_data_to_show">No data to show</string>
+    <string name="create_new_listing">Create New Listing</string>
+    <string name="profile">Profile</string>
+    <string name="catalogue">Catalogue</string>
+    <string name="services">Services</string>
+    <string name="packages">Packages</string>
+    <string name="peie">PEIE</string>
+    <string name="support">Support</string>
+    <string name="faq">FAQ</string>
+    <string name="app_settings">App Settings</string>
+    <string name="legal">Legal</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="rate_us">Rate Us</string>
+
+
+</resources>
