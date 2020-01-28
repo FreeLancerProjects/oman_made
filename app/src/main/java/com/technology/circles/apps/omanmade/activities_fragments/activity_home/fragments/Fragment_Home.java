@@ -43,7 +43,7 @@ public class Fragment_Home extends Fragment {
         preferences = Preferences.newInstance();
         Paper.init(activity);
         lang = Paper.book().read("lang","ar");
-        binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        binding.progBarSponsor.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
 
 
     }
