@@ -1,15 +1,11 @@
 package com.technology.circles.apps.omanmade.ui_general_method;
 
-import android.net.Uri;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.databinding.BindingAdapter;
-
-import com.squareup.picasso.Picasso;
-import com.technology.circles.apps.omanmade.tags.Tags;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,7 +54,7 @@ public class UI_General_Method {
             if (endPoint!=null)
             {
 
-             //   Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_AVATAR+endPoint)).fit().into(imageView);
+                //Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_AVATAR+endPoint)).fit().into(imageView);
             }else
                 {
                     //Picasso.with(imageView.getContext()).load(R.drawable.ic_user).fit().into(imageView);

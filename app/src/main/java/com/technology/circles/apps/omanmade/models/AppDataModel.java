@@ -2,7 +2,7 @@ package com.technology.circles.apps.omanmade.models;
 
 import java.io.Serializable;
 
-public class App_Data_Model implements Serializable {
+public class AppDataModel implements Serializable {
 
     private int id;
             private String mob_number1;

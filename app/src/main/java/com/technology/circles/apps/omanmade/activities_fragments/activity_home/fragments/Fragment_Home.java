@@ -35,6 +35,7 @@ public class Fragment_Home extends Fragment {
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home,container,false);
         initView();
+
         return binding.getRoot();
     }
 

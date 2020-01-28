@@ -27,6 +27,7 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.material.tabs.TabLayout;
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_contact.ContactUsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Directory;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Industry;
@@ -52,24 +53,22 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment_Sponsor fragment_sponsor;
     private String lang;
     ///////////////////////////////////////////////////
-    private CardView cardViewMainHome,cardViewHome,cardViewDirectory,cardViewCreateList,cardViewProfile,
-            cardViewMainAbout,cardViewCatalogue,cardViewService,cardViewPackage,cardViewAbout,cardViewPeie,
-            cardViewMainSupport,cardViewFaq,cardViewContact,cardViewSetting,
-            cardViewMainLegal,cardViewPrivacy,cardViewTerms;
+    private CardView cardViewMainHome, cardViewHome, cardViewDirectory, cardViewCreateList, cardViewProfile,
+            cardViewMainAbout, cardViewCatalogue, cardViewService, cardViewPackage, cardViewAbout, cardViewPeie,
+            cardViewMainSupport, cardViewFaq, cardViewContact, cardViewSetting,
+            cardViewMainLegal, cardViewPrivacy, cardViewTerms;
 
-    private ImageView arrow1,arrow2,arrow3,arrow4,imgFacebook,imgIntagram,imgWhatsApp,imgTwitter;
-    private ExpandableLayout expandLayoutHome,expandLayoutAbout,expandLayoutSupport,expandLayoutLegal;
+    private ImageView arrow1, arrow2, arrow3, arrow4, imgFacebook, imgIntagram, imgWhatsApp, imgTwitter;
+    private ExpandableLayout expandLayoutHome, expandLayoutAbout, expandLayoutSupport, expandLayoutLegal;
     private TabLayout tab;
-    private TextView tvRate,tvTitle;
+    private TextView tvRate, tvTitle;
     private LinearLayout llHomeContent;
-
-
 
 
     @Override
     protected void attachBaseContext(Context newBase) {
         Paper.init(newBase);
-        super.attachBaseContext(LanguageHelper.updateResources(newBase, Paper.book().read("lang","ar")));
+        super.attachBaseContext(LanguageHelper.updateResources(newBase, Paper.book().read("lang", "ar")));
     }
 
     @Override
@@ -78,8 +77,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initView();
         fragmentManager = getSupportFragmentManager();
-        if (savedInstanceState==null)
-        {
+        if (savedInstanceState == null) {
             DisplayFragmentHome();
         }
 
@@ -87,15 +85,14 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initView() {
         Paper.init(this);
-        lang = Paper.book().read("lang","ar");
+        lang = Paper.book().read("lang", "ar");
         toolbar = findViewById(R.id.toolbar);
         drawer = findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(this,drawer,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         toggle.syncState();
-
+        toggle.getDrawerArrowDrawable().setColor(ContextCompat.getColor(this, R.color.black));
         ah_bottom_nav = findViewById(R.id.ah_bottom_nav);
         setUpBottomNavigation();
-
 
 
         cardViewMainHome = findViewById(R.id.cardViewMainHome);
@@ -134,73 +131,12 @@ public class HomeActivity extends AppCompatActivity {
         tvRate = findViewById(R.id.tvRate);
         tvTitle = findViewById(R.id.tvTitle);
 
-
-        cardViewMainHome.setOnClickListener(view -> {
-
-            if (expandLayoutHome.isExpanded())
-            {
-                expandLayoutHome.collapse(true);
-                arrow1.animate().rotationBy(-180).setDuration(500).start();
-            }else
-                {
-                    expandLayoutHome.expand(true);
-                    arrow1.animate().rotationBy(180).setDuration(500).start();
-                }
-
-        });
-
-        cardViewMainAbout.setOnClickListener(view -> {
-
-            if (expandLayoutAbout.isExpanded())
-            {
-                expandLayoutAbout.collapse(true);
-                arrow2.animate().rotationBy(-180).setDuration(500).start();
-            }else
-            {
-                expandLayoutAbout.expand(true);
-                arrow2.animate().rotationBy(180).setDuration(500).start();
-            }
-
-        });
-
-        cardViewMainSupport.setOnClickListener(view -> {
-
-            if (expandLayoutSupport.isExpanded())
-            {
-                expandLayoutSupport.collapse(true);
-                arrow3.animate().rotationBy(-180).setDuration(500).start();
-            }else
-            {
-                expandLayoutSupport.expand(true);
-                arrow3.animate().rotationBy(180).setDuration(500).start();
-            }
-
-        });
-
-        cardViewMainLegal.setOnClickListener(view -> {
-
-            if (expandLayoutLegal.isExpanded())
-            {
-                expandLayoutLegal.collapse(true);
-                arrow4.animate().rotationBy(-180).setDuration(500).start();
-            }else
-            {
-                expandLayoutLegal.expand(true);
-                arrow4.animate().rotationBy(180).setDuration(500).start();
-            }
-
-        });
-
-
-
         tab.addTab(tab.newTab().setText("عربي"));
         tab.addTab(tab.newTab().setText("English"));
 
-        if (lang.equals("ar"))
-        {
+        if (lang.equals("ar")) {
             tab.getTabAt(0).select();
-        }else
-        {
+        } else {
             tab.getTabAt(1).select();
 
         }
@@ -215,10 +151,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
 
-                float slideX = drawerView.getWidth()*slideOffset;
-                if (lang.equals("ar"))
-                {
-                    slideX = slideX*-1;
+                float slideX = drawerView.getWidth() * slideOffset;
+                if (lang.equals("ar")) {
+                    slideX = slideX * -1;
                 }
                 llHomeContent.setTranslationX(slideX);
 
@@ -249,11 +184,9 @@ public class HomeActivity extends AppCompatActivity {
 
 
                 int pos = tab.getPosition();
-                if (pos==0)
-                {
+                if (pos == 0) {
                     RefreshActivity("ar");
-                }else
-                {
+                } else {
                     RefreshActivity("en");
 
                 }
@@ -273,14 +206,75 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
+        cardViewMainHome.setOnClickListener(view -> {
+
+            if (expandLayoutHome.isExpanded()) {
+                expandLayoutHome.collapse(true);
+                arrow1.animate().rotationBy(-180).setDuration(500).start();
+            } else {
+                expandLayoutHome.expand(true);
+                arrow1.animate().rotationBy(180).setDuration(500).start();
+            }
+
+        });
+
+        cardViewMainAbout.setOnClickListener(view -> {
+
+            if (expandLayoutAbout.isExpanded()) {
+                expandLayoutAbout.collapse(true);
+                arrow2.animate().rotationBy(-180).setDuration(500).start();
+            } else {
+                expandLayoutAbout.expand(true);
+                arrow2.animate().rotationBy(180).setDuration(500).start();
+            }
+
+        });
+
+        cardViewMainSupport.setOnClickListener(view -> {
+
+            if (expandLayoutSupport.isExpanded()) {
+                expandLayoutSupport.collapse(true);
+                arrow3.animate().rotationBy(-180).setDuration(500).start();
+            } else {
+                expandLayoutSupport.expand(true);
+                arrow3.animate().rotationBy(180).setDuration(500).start();
+            }
+
+        });
+
+        cardViewMainLegal.setOnClickListener(view -> {
+
+            if (expandLayoutLegal.isExpanded()) {
+                expandLayoutLegal.collapse(true);
+                arrow4.animate().rotationBy(-180).setDuration(500).start();
+            } else {
+                expandLayoutLegal.expand(true);
+                arrow4.animate().rotationBy(180).setDuration(500).start();
+            }
+
+        });
+
+        cardViewContact.setOnClickListener(view -> {
+
+            arrow4.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutLegal.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+            new Handler()
+                    .postDelayed(this::navigateToContactActivity, 1000);
+
+        });
+
         cardViewHome.setOnClickListener(view -> {
 
+            arrow1.animate().rotationBy(-180).setDuration(500).start();
             expandLayoutHome.collapse(true);
             new Handler()
                     .postDelayed(() -> {
                         drawer.closeDrawer(GravityCompat.START);
                         DisplayFragmentHome();
-                    },500);
+                    }, 500);
 
 
         });
@@ -292,10 +286,15 @@ public class HomeActivity extends AppCompatActivity {
                     .postDelayed(() -> {
                         drawer.closeDrawer(GravityCompat.START);
                         DisplayFragmentDirectory();
-                    },500);
+                    }, 500);
 
 
         });
+    }
+
+    private void navigateToContactActivity() {
+        Intent intent = new Intent(this, ContactUsActivity.class);
+        startActivity(intent);
     }
 
 
@@ -338,7 +337,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         ah_bottom_nav.setCurrentItem(0, false);
-
 
 
     }
@@ -402,7 +400,6 @@ public class HomeActivity extends AppCompatActivity {
         }
         ah_bottom_nav.setCurrentItem(1, false);
         tvTitle.setText(getString(R.string.directory));
-
 
 
     }
@@ -493,8 +490,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         List<Fragment> fragments = fragmentManager.getFragments();
-        for (Fragment fragment:fragments)
-        {
+        for (Fragment fragment : fragments) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
 
@@ -505,32 +501,26 @@ public class HomeActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         List<Fragment> fragments = fragmentManager.getFragments();
-        for (Fragment fragment:fragments)
-        {
+        for (Fragment fragment : fragments) {
             fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
 
     }
 
-
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START))
-        {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
 
 
-
-        }else
-        {
+        } else {
             if (fragment_home != null && fragment_home.isAdded() && fragment_home.isVisible()) {
                 finish();
 
             } else {
                 DisplayFragmentHome();
             }
-
 
 
         }

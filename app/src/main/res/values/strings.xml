@@ -53,6 +53,14 @@
     <string name="rate_us">Rate Us</string>
     <string name="keyword">Keyword</string>
     <string name="search2">Search</string>
+    <string name="phone">Phone</string>
+    <string name="address">Address</string>
+    <string name="email">Email</string>
+    <string name="send_a_message">Send a message</string>
+    <string name="name">Name</string>
+    <string name="subject">Subject</string>
+    <string name="message">Message</string>
+    <string name="wait">Wait...</string>
 
 
 </resources>
