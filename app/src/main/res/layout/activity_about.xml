@@ -13,7 +13,7 @@
 
         <variable
             name="appdatamodel"
-            type="com.technology.circles.apps.omanmade.models.App_Data_Model" />
+            type="com.technology.circles.apps.omanmade.models.AppDataModel" />
 
         <variable
             name="lang"

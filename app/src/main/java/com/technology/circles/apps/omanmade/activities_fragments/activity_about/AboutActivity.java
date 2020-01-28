@@ -16,7 +16,7 @@ import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.databinding.ActivityAboutBinding;
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
-import com.technology.circles.apps.omanmade.models.App_Data_Model;
+import com.technology.circles.apps.omanmade.models.AppDataModel;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.tags.Tags;
 
@@ -60,10 +60,10 @@ getabout();
     private void getabout() {
 
         Api.getService(Tags.base_url2)
-                .getsetting(lang)
-                .enqueue(new Callback<App_Data_Model>() {
+                .getSetting(lang)
+                .enqueue(new Callback<AppDataModel>() {
                     @Override
-                    public void onResponse(Call<App_Data_Model> call, Response<App_Data_Model> response) {
+                    public void onResponse(Call<AppDataModel> call, Response<AppDataModel> response) {
                         binding.progBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null ) {
 
@@ -87,7 +87,7 @@ getabout();
                     }
 
                     @Override
-                    public void onFailure(Call<App_Data_Model> call, Throwable t) {
+                    public void onFailure(Call<AppDataModel> call, Throwable t) {
                         try {
                             binding.progBar.setVisibility(View.GONE);
                             if (t.getMessage() != null) {
