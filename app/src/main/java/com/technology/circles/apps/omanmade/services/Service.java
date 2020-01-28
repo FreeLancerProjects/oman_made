@@ -2,6 +2,7 @@ package com.technology.circles.apps.omanmade.services;
 
 
 import com.technology.circles.apps.omanmade.models.AppDataModel;
+import com.technology.circles.apps.omanmade.models.FaqsModel;
 import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
 import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
 import com.technology.circles.apps.omanmade.models.SliderModel;
@@ -29,7 +30,8 @@ public interface Service {
     Call<AppDataModel> getSetting(@Header("lang") String lang);
     @GET("api/slides")
     Call<SliderModel> geSlider();
-
+    @GET("api/faqs")
+    Call<FaqsModel> getFaqs(@Header("lang") String lang);
 
 }
 

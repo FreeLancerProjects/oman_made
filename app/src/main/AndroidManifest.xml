@@ -53,8 +53,10 @@
             android:name=".activities_fragments.activity_peie.PeieActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
-
+        <activity android:name=".activities_fragments.activity_faqs.FagsActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_api_key" />

@@ -30,6 +30,7 @@ import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_contact.ContactUsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_about.AboutActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_catalogue.CataLogueActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_faqs.FagsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Directory;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Industry;
@@ -311,6 +312,13 @@ cardViewAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(HomeActivity.this, PeieActivity.class);
+                startActivity(intent);
+            }
+        });
+        cardViewFaq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(HomeActivity.this, FagsActivity.class);
                 startActivity(intent);
             }
         });
