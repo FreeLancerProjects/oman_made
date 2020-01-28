@@ -58,7 +58,7 @@ public class UI_General_Method {
             if (endPoint!=null)
             {
 
-                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_AVATAR+endPoint)).fit().into(imageView);
+             //   Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_AVATAR+endPoint)).fit().into(imageView);
             }else
                 {
                     //Picasso.with(imageView.getContext()).load(R.drawable.ic_user).fit().into(imageView);
