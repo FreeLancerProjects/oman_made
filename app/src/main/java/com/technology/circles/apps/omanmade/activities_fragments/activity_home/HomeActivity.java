@@ -28,10 +28,13 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.material.tabs.TabLayout;
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_contact.ContactUsActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_about.AboutActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_catalogue.CataLogueActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Directory;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Industry;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Sponsor;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_peie.PeieActivity;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -289,6 +292,27 @@ public class HomeActivity extends AppCompatActivity {
                     }, 500);
 
 
+        });
+cardViewAbout.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        Intent intent=new Intent(HomeActivity.this, AboutActivity.class);
+        startActivity(intent);
+    }
+});
+        cardViewCatalogue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(HomeActivity.this, CataLogueActivity.class);
+                startActivity(intent);
+            }
+        });
+        cardViewPeie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(HomeActivity.this, PeieActivity.class);
+                startActivity(intent);
+            }
         });
     }
 
