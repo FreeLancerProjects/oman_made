@@ -53,7 +53,7 @@
             android:name=".activities_fragments.activity_peie.PeieActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
-        <activity android:name=".activities_fragments.activity_faqs.FagsActivity"
+        <activity android:name=".activities_fragments.activity_faqs.FaqsActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             />

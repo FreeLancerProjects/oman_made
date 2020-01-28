@@ -4,17 +4,16 @@ import java.io.Serializable;
 import java.util.List;
 
 public class SliderModel implements Serializable {
-    private List<Slides> slides;
+    private List<Slide> slides;
 
-    public List<Slides> getSlides() {
+    public List<Slide> getSlides() {
         return slides;
     }
 
-    public  class  Slides implements Serializable
-    {
+    public class Slide implements Serializable {
         private int id;
-           private String image;
-                   private String web_id;
+        private String image;
+        private String web_id;
 
         public int getId() {
             return id;

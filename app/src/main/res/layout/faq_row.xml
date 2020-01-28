@@ -10,7 +10,7 @@
             type="String" />
 
         <variable
-            name="faqmodel"
+            name="model"
             type="com.technology.circles.apps.omanmade.models.FaqsModel.Faqs" />
 
 
@@ -27,9 +27,9 @@
             android:id="@+id/cardViewCatalogue"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginTop="5dp"
-            android:layout_marginEnd="8dp"
             app:cardBackgroundColor="@color/colorPrimary"
             app:cardCornerRadius="20dp"
             app:cardElevation="4dp"
@@ -39,14 +39,19 @@
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center"
-                android:text="@{faqmodel.question}"
+                android:text='@{model.question??""}'
                 android:textColor="@color/white"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+
+
+                />
 
         </androidx.cardview.widget.CardView>
 
@@ -55,6 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginEnd="15dp"
+            android:layout_marginBottom="5dp"
             android:background='@{lang.equals("en")?@drawable/chat_left_bg:@drawable/chat_right_bg}'>
 
             <TextView
@@ -65,7 +71,7 @@
                 android:layout_marginEnd="15dp"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="@{faqmodel.answer}"
+                android:text="@{model.answer}"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
         </FrameLayout>

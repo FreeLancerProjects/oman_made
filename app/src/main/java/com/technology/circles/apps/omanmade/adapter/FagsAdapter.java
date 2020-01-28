@@ -51,8 +51,8 @@ public class FagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         EventHolder eventHolder = (EventHolder) holder;
 
-eventHolder.binding.setLang(lang);
-eventHolder.binding.setFaqmodel(faqsList.get(position));
+        eventHolder.binding.setLang(lang);
+        eventHolder.binding.setModel(faqsList.get(position));
 
     }
 

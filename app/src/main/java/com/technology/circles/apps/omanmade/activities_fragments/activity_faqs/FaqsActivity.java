@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.adapter.FagsAdapter;
 import com.technology.circles.apps.omanmade.databinding.ActivityFaqsBinding;
-import com.technology.circles.apps.omanmade.databinding.ActivityPeieBinding;
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
 import com.technology.circles.apps.omanmade.models.FaqsModel;
@@ -32,11 +31,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FagsActivity extends AppCompatActivity implements Listeners.BackListener {
+public class FaqsActivity extends AppCompatActivity implements Listeners.BackListener {
     private ActivityFaqsBinding binding;
     private String lang;
-private List<FaqsModel.Faqs> faqsLis;
-private FagsAdapter fagsAdapter;
+    private List<FaqsModel.Faqs> faqsLis;
+    private FagsAdapter fagsAdapter;
+
     @Override
     protected void attachBaseContext(Context newBase) {
         Paper.init(newBase);
@@ -53,17 +53,18 @@ private FagsAdapter fagsAdapter;
 
 
     private void initView() {
-faqsLis=new ArrayList<>();
+        faqsLis = new ArrayList<>();
         Paper.init(this);
         lang = Paper.book().read("lang", Locale.getDefault().getLanguage());
         binding.setLang(lang);
         binding.setBackListener(this);
-       binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-fagsAdapter=new FagsAdapter(faqsLis,this);
-binding.recView.setLayoutManager(new GridLayoutManager(this,1));
-binding.recView.setAdapter(fagsAdapter);
-getFaqs();
+        binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        fagsAdapter = new FagsAdapter(faqsLis, this);
+        binding.recView.setLayoutManager(new GridLayoutManager(this, 1));
+        binding.recView.setAdapter(fagsAdapter);
+        getFaqs();
     }
+
     public void getFaqs() {
         binding.progBar.setVisibility(View.VISIBLE);
 
@@ -77,19 +78,31 @@ getFaqs();
 
                             faqsLis.addAll(response.body().getFaqs());
                             if (response.body().getFaqs().size() > 0) {
-                                // rec_sent.setVisibility(View.VISIBLE);
-
-                                binding.llNoStore.setVisibility(View.GONE);
+                                binding.tvNoData.setVisibility(View.GONE);
                                 fagsAdapter.notifyDataSetChanged();
-                                //   total_page = response.body().getMeta().getLast_page();
 
                             } else {
-                                binding.llNoStore.setVisibility(View.VISIBLE);
+                                binding.tvNoData.setVisibility(View.VISIBLE);
 
                             }
                         } else {
 
-                           // Toast.makeText(FagsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(FaqsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(FaqsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
                             try {
                                 Log.e("Error_code", response.code() + "_" + response.errorBody().string());
                             } catch (IOException e) {
@@ -102,10 +115,24 @@ getFaqs();
                     public void onFailure(Call<FaqsModel> call, Throwable t) {
                         try {
 
+
                             binding.progBar.setVisibility(View.GONE);
 
-                            //    Toast.makeText(activity, getString(R.string.something), Toast.LENGTH_SHORT).show();
-                            Log.e("error", t.getMessage());
+                            Toast.makeText(FaqsActivity.this, getString(R.string.something), Toast.LENGTH_SHORT).show();
+
+
+                            try {
+                                if (t.getMessage() != null) {
+                                    Log.e("error", t.getMessage());
+                                    if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                        Toast.makeText(FaqsActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(FaqsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                            }
                         } catch (Exception e) {
                         }
                     }

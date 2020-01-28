@@ -54,10 +54,11 @@ public class AboutActivity extends AppCompatActivity implements Listeners.BackLi
         binding.setLang(lang);
         binding.setBackListener(this);
         binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-getabout();
+        getAbout();
 
     }
-    private void getabout() {
+
+    private void getAbout() {
 
         Api.getService(Tags.base_url2)
                 .getSetting(lang)
@@ -65,9 +66,9 @@ getabout();
                     @Override
                     public void onResponse(Call<AppDataModel> call, Response<AppDataModel> response) {
                         binding.progBar.setVisibility(View.GONE);
-                        if (response.isSuccessful() && response.body() != null ) {
+                        if (response.isSuccessful() && response.body() != null) {
 
-                            binding.setAppdatamodel(response.body());
+                            binding.setModel(response.body());
                         } else {
                             try {
 

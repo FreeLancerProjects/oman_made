@@ -27,10 +27,10 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.material.tabs.TabLayout;
 import com.technology.circles.apps.omanmade.R;
-import com.technology.circles.apps.omanmade.activities_fragments.activity_contact.ContactUsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_about.AboutActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_catalogue.CataLogueActivity;
-import com.technology.circles.apps.omanmade.activities_fragments.activity_faqs.FagsActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_contact.ContactUsActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_faqs.FaqsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Directory;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Industry;
@@ -294,34 +294,60 @@ public class HomeActivity extends AppCompatActivity {
 
 
         });
-cardViewAbout.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        Intent intent=new Intent(HomeActivity.this, AboutActivity.class);
+        cardViewAbout.setOnClickListener(v -> {
+            arrow2.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutAbout.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler()
+                    .postDelayed(this::navigateToAboutActivity, 1000);
+
+
+        });
+
+        cardViewCatalogue.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, CataLogueActivity.class);
+            startActivity(intent);
+        });
+
+        cardViewPeie.setOnClickListener(v -> {
+
+            arrow2.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutAbout.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler().postDelayed(this::navigatePeieActivity, 1000);
+        });
+        cardViewFaq.setOnClickListener(v -> {
+            arrow3.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutSupport.collapse(true);
+
+            new Handler().postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler().postDelayed(this::navigateToFaqActivity, 1000);
+
+
+        });
+    }
+
+    private void navigatePeieActivity() {
+        Intent intent = new Intent(HomeActivity.this, PeieActivity.class);
         startActivity(intent);
     }
-});
-        cardViewCatalogue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(HomeActivity.this, CataLogueActivity.class);
-                startActivity(intent);
-            }
-        });
-        cardViewPeie.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(HomeActivity.this, PeieActivity.class);
-                startActivity(intent);
-            }
-        });
-        cardViewFaq.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(HomeActivity.this, FagsActivity.class);
-                startActivity(intent);
-            }
-        });
+
+    private void navigateToAboutActivity() {
+        Intent intent = new Intent(HomeActivity.this, AboutActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToFaqActivity() {
+        Intent intent = new Intent(HomeActivity.this, FaqsActivity.class);
+        startActivity(intent);
     }
 
     private void navigateToContactActivity() {
