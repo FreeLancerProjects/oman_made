@@ -1,16 +1,14 @@
 package com.technology.circles.apps.omanmade.services;
 
 
-import com.technology.circles.apps.omanmade.models.App_Data_Model;
+import com.technology.circles.apps.omanmade.models.AppDataModel;
 import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
 import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
+import com.technology.circles.apps.omanmade.models.SliderModel;
 
 import retrofit2.Call;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface Service {
@@ -28,9 +26,9 @@ public interface Service {
                                       @Query(value = "language") String language,
                                       @Query(value = "key") String key);
     @GET("api/settings")
-    Call<App_Data_Model> getsetting(@Header("lang") String lang);
+    Call<AppDataModel> getSetting(@Header("lang") String lang);
     @GET("api/slides")
-    Call<SliderModel> get_slider();
+    Call<SliderModel> geSlider();
 
 
 }
