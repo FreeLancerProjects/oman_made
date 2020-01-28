@@ -4,6 +4,7 @@ package com.technology.circles.apps.omanmade.services;
 import com.technology.circles.apps.omanmade.models.App_Data_Model;
 import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
 import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
+import com.technology.circles.apps.omanmade.models.SliderModel;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -29,7 +30,8 @@ public interface Service {
                                       @Query(value = "key") String key);
     @GET("api/settings")
     Call<App_Data_Model> getsetting(@Header("lang") String lang);
-
+    @GET("api/slides")
+    Call<SliderModel> get_slider();
 
 }
 
