@@ -145,23 +145,35 @@
                 android:layout_marginTop="-15dp"
                 android:background="@color/white"
                 android:paddingTop="20dp"
+                android:paddingBottom="10dp"
 
 
                 >
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recViewSponsor"
+                    android:id="@+id/recViewFeature"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
                     />
                 <ProgressBar
-                    android:id="@+id/progBarSponsor"
+                    android:id="@+id/progBarFeature"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:layout_gravity="center"
                     />
 
+                <TextView
+                    android:id="@+id/tvNoData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:text="@string/no_data_to_show"
+                    android:textColor="@color/black"
+                    android:visibility="gone"
+                    />
             </FrameLayout>
 
         </LinearLayout>

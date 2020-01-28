@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="model"
+            type="com.technology.circles.apps.omanmade.models.FeatureDataModel.FeatureModel" />
+    </data>
+    <androidx.cardview.widget.CardView
+        android:layout_width="120dp"
+        android:layout_height="140dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="3dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="3dp"
+        >
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:riv_corner_radius="8dp"
+            app:riv_border_width="0dp"
+            />
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -13,7 +13,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.technology.circles.apps.omanmade.R;
-import com.technology.circles.apps.omanmade.adapter.FagsAdapter;
+import com.technology.circles.apps.omanmade.adapter.FaqsAdapter;
 import com.technology.circles.apps.omanmade.databinding.ActivityFaqsBinding;
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
@@ -35,7 +35,7 @@ public class FaqsActivity extends AppCompatActivity implements Listeners.BackLis
     private ActivityFaqsBinding binding;
     private String lang;
     private List<FaqsModel.Faqs> faqsLis;
-    private FagsAdapter fagsAdapter;
+    private FaqsAdapter faqsAdapter;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -59,9 +59,9 @@ public class FaqsActivity extends AppCompatActivity implements Listeners.BackLis
         binding.setLang(lang);
         binding.setBackListener(this);
         binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        fagsAdapter = new FagsAdapter(faqsLis, this);
+        faqsAdapter = new FaqsAdapter(faqsLis, this);
         binding.recView.setLayoutManager(new GridLayoutManager(this, 1));
-        binding.recView.setAdapter(fagsAdapter);
+        binding.recView.setAdapter(faqsAdapter);
         getFaqs();
     }
 
@@ -79,7 +79,7 @@ public class FaqsActivity extends AppCompatActivity implements Listeners.BackLis
                             faqsLis.addAll(response.body().getFaqs());
                             if (response.body().getFaqs().size() > 0) {
                                 binding.tvNoData.setVisibility(View.GONE);
-                                fagsAdapter.notifyDataSetChanged();
+                                faqsAdapter.notifyDataSetChanged();
 
                             } else {
                                 binding.tvNoData.setVisibility(View.VISIBLE);

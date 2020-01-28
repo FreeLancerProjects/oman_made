@@ -10,10 +10,9 @@ public class SponsorsModel implements Serializable {
         return sponsors;
     }
 
-    public class Sponsors
-    {
+    public class Sponsors {
         private int id;
-            private String logo;
+        private String logo;
 
         public int getId() {
             return id;

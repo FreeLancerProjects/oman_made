@@ -3,9 +3,11 @@ package com.technology.circles.apps.omanmade.services;
 
 import com.technology.circles.apps.omanmade.models.AppDataModel;
 import com.technology.circles.apps.omanmade.models.FaqsModel;
+import com.technology.circles.apps.omanmade.models.FeatureDataModel;
 import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
 import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
 import com.technology.circles.apps.omanmade.models.SliderModel;
+import com.technology.circles.apps.omanmade.models.SponsorsModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -28,11 +30,18 @@ public interface Service {
                                       @Query(value = "key") String key);
     @GET("api/settings")
     Call<AppDataModel> getSetting(@Header("lang") String lang);
+
     @GET("api/slides")
     Call<SliderModel> geSlider();
+
     @GET("api/faqs")
     Call<FaqsModel> getFaqs(@Header("lang") String lang);
 
+    @GET("api/sponsors")
+    Call<SponsorsModel.Sponsors> getSponsor();
+
+    @GET("api/featured-lists")
+    Call<FeatureDataModel> getFeatures();
 }
 
 

@@ -18,14 +18,14 @@ import java.util.Locale;
 
 import io.paperdb.Paper;
 
-public class FagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FaqsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<FaqsModel.Faqs> faqsList;
     private Context context;
     private LayoutInflater inflater;
     private String lang;
 
-    public FagsAdapter(List<FaqsModel.Faqs> faqsList, Context context) {
+    public FaqsAdapter(List<FaqsModel.Faqs> faqsList, Context context) {
         this.faqsList = faqsList;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -41,7 +41,7 @@ public class FagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
         FaqRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.faq_row, parent, false);
-        return new EventHolder(binding);
+        return new MyHolder(binding);
 
 
     }
@@ -49,7 +49,7 @@ public class FagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
 
-        EventHolder eventHolder = (EventHolder) holder;
+        MyHolder eventHolder = (MyHolder) holder;
 
         eventHolder.binding.setLang(lang);
         eventHolder.binding.setModel(faqsList.get(position));
@@ -61,10 +61,10 @@ public class FagsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return faqsList.size();
     }
 
-    public class EventHolder extends RecyclerView.ViewHolder {
+    public class MyHolder extends RecyclerView.ViewHolder {
         public FaqRowBinding binding;
 
-        public EventHolder(@NonNull FaqRowBinding binding) {
+        public MyHolder(@NonNull FaqRowBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 
