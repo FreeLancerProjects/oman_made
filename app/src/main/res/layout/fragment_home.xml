@@ -17,37 +17,52 @@
             android:orientation="vertical"
             >
 
-            <LinearLayout
-                android:id="@+id/llSliderContainer"
+            <FrameLayout
+                android:id="@+id/flSliderContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 >
-                <androidx.viewpager.widget.ViewPager
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="180dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_marginTop="10dp"
+                    >
+                    <androidx.viewpager.widget.ViewPager
+                        android:id="@+id/pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:layout_marginTop="10dp"
 
-                    />
+                        />
 
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tab"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    app:tabGravity="fill"
-                    app:tabMode="scrollable"
-                    app:tabIndicatorHeight="0dp"
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/tab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="8dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginTop="8dp"
+                        app:tabMaxWidth="15dp"
+                        app:tabGravity="fill"
+                        app:tabMode="scrollable"
+                        app:tabIndicatorHeight="0dp"
+                        android:layout_marginBottom="5dp"
+                        app:tabBackground="@drawable/tab_home_indicator"
+                        android:layout_gravity="center_horizontal"
 
-                    />
+                        />
 
-            </LinearLayout>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progBarSlider"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"/>
+
+            </FrameLayout>
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -56,7 +71,7 @@
                 android:layout_marginEnd="10dp"
                 app:contentPadding="5dp"
                 app:cardElevation="3dp"
-                app:cardCornerRadius="20dp"
+                app:cardCornerRadius="8dp"
                 app:cardBackgroundColor="@color/white"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="20dp"
@@ -151,6 +166,67 @@
                 >
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recViewSponsor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    />
+                <ProgressBar
+                    android:id="@+id/progBarSponsor"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    />
+
+                <TextView
+                    android:id="@+id/tvNoData1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:text="@string/no_data_to_show"
+                    android:textColor="@color/black"
+                    android:visibility="gone"
+                    />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:text="@string/listings"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginEnd="30dp"
+                    />
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="10dp"
+
+
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recViewFeature"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -164,7 +240,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/tvNoData"
+                    android:id="@+id/tvNoData2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -175,6 +251,81 @@
                     android:visibility="gone"
                     />
             </FrameLayout>
+
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_marginBottom="8dp"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        >
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            android:text="@string/feat_cat"/>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/colorPrimary"
+                            android:layout_marginTop="3dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginEnd="30dp"
+                            />
+
+
+                    </LinearLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recViewCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+
+                            />
+                        <ProgressBar
+                            android:id="@+id/progBarCategory"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center"
+                            />
+
+                        <TextView
+                            android:id="@+id/tvNoData3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:text="@string/no_data_to_show"
+                            android:textColor="@color/black"
+                            android:visibility="gone"
+                            />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
 
         </LinearLayout>
 

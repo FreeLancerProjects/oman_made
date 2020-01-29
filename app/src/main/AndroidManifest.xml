@@ -15,18 +15,23 @@
     <application
         android:name=".language.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:icon"
         tools:targetApi="m">
-        <activity android:name=".activities_fragments.activity_contact.ContactUsActivity"
+        <activity android:name=".activities_fragments.activity_packages.PackagesActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             />
+        <activity
+            android:name=".activities_fragments.activity_contact.ContactUsActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activities_fragments.activity_language.LanguageActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
@@ -40,23 +45,24 @@
         <activity
             android:name=".activities_fragments.activity_home.HomeActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activities_fragments.activity_about.AboutActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activities_fragments.activity_catalogue.CataLogueActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activities_fragments.activity_peie.PeieActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
-        <activity android:name=".activities_fragments.activity_faqs.FaqsActivity"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+        <activity
+            android:name=".activities_fragments.activity_faqs.FaqsActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_api_key" />

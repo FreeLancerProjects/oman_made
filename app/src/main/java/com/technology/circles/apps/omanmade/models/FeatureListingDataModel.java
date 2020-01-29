@@ -3,7 +3,7 @@ package com.technology.circles.apps.omanmade.models;
 import java.io.Serializable;
 import java.util.List;
 
-public class FeatureDataModel implements Serializable {
+public class FeatureListingDataModel implements Serializable {
 
     private List<FeatureModel> featured_lists;
 
@@ -15,6 +15,7 @@ public class FeatureDataModel implements Serializable {
     {
         private int id;
         private String image;
+        private String name;
         private int web_id;
 
         public int getId() {
@@ -27,6 +28,10 @@ public class FeatureDataModel implements Serializable {
 
         public int getWeb_id() {
             return web_id;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

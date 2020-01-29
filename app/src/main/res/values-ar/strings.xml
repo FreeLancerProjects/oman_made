@@ -69,6 +69,8 @@
     <string name="message">الرسالة</string>
     <string name="wait">إنتظر قليلا...</string>
     <string name="about_oman_made">عن عمان ميد</string>
+    <string name="listings">الإضافات <font color = '#33bcc2'>المميزة</font></string>
+    <string name="feat_cat">أنواع <font color='#33bcc2'> الإضافات</font></string>
 
 
 </resources>

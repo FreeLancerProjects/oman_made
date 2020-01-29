@@ -3,7 +3,8 @@ package com.technology.circles.apps.omanmade.services;
 
 import com.technology.circles.apps.omanmade.models.AppDataModel;
 import com.technology.circles.apps.omanmade.models.FaqsModel;
-import com.technology.circles.apps.omanmade.models.FeatureDataModel;
+import com.technology.circles.apps.omanmade.models.FeatureListingDataModel;
+import com.technology.circles.apps.omanmade.models.PackageDataModel;
 import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
 import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
 import com.technology.circles.apps.omanmade.models.SliderModel;
@@ -38,10 +39,13 @@ public interface Service {
     Call<FaqsModel> getFaqs(@Header("lang") String lang);
 
     @GET("api/sponsors")
-    Call<SponsorsModel.Sponsors> getSponsor();
+    Call<SponsorsModel> getSponsor();
 
     @GET("api/featured-lists")
-    Call<FeatureDataModel> getFeatures();
+    Call<FeatureListingDataModel> getFeatures(@Header("lang")String lang);
+
+    @GET("api/packages")
+    Call<PackageDataModel> getPackages(@Header("lang")String lang);
 }
 
 

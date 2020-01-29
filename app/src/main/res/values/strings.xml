@@ -62,6 +62,8 @@
     <string name="message">Message</string>
     <string name="wait">Wait...</string>
     <string name="about_oman_made">About Oman Made</string>
+    <string name="listings">Featured <font color='#33bcc2'> Listings</font></string>
+    <string name="feat_cat">Featured <font color='#33bcc2'> Categories</font></string>
 
 
 </resources>

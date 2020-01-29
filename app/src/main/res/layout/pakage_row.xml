@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="model"
+            type="com.technology.circles.apps.omanmade.models.PackageDataModel.Packages" />
+    </data>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="@color/transparent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="20dp"
+            >
+            <LinearLayout
+                android:layout_width="230dp"
+                android:layout_height="400dp"
+                android:orientation="vertical"
+
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/package_black_bg"
+                    android:padding="8dp"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:text='@{model.title??""}'
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/gray0"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:layout_marginTop="8dp"
+                        android:maxLines="2"
+                        android:gravity="center"
+                        android:ellipsize="end"
+                        android:text='@{model.package_desc??""}'
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:background="@drawable/package_white_bg"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    >
+                    <TextView
+                        android:id="@+id/tvTitle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="@color/gray5"
+                        android:textSize="13sp"
+
+                        />
+
+                    <TextView
+                        android:id="@+id/tvDesc1"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+
+
+                        />
+
+                    <TextView
+                        android:id="@+id/tvTitle2"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/gray5"
+                        android:textSize="13sp"
+
+                        />
+
+                    <TextView
+                        android:id="@+id/tvDesc2"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+
+
+                        />
+
+
+                    <TextView
+                        android:id="@+id/tvTitle3"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/gray5"
+                        android:textSize="13sp"
+
+                        />
+
+                    <TextView
+                        android:id="@+id/tvDesc3"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+
+
+                        />
+
+
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+    </FrameLayout>
+
+</layout>

@@ -10,19 +10,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
-import com.technology.circles.apps.omanmade.databinding.FeatureRowBinding;
-import com.technology.circles.apps.omanmade.models.FeatureDataModel;
+import com.technology.circles.apps.omanmade.databinding.SponsorRowBinding;
+import com.technology.circles.apps.omanmade.models.SponsorsModel;
 
 import java.util.List;
 
-public class FeatureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<FeatureDataModel.FeatureModel> list;
+    private List<SponsorsModel.Sponsors> list;
     private Context context;
     private LayoutInflater inflater;
     private Fragment fragment;
 
-    public FeatureAdapter(List<FeatureDataModel.FeatureModel> list, Context context,Fragment fragment) {
+    public SponsorAdapter(List<SponsorsModel.Sponsors> list, Context context, Fragment fragment) {
         this.list = list;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -36,7 +36,7 @@ public class FeatureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
 
-        FeatureRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.feature_row, parent, false);
+        SponsorRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.sponsor_row, parent, false);
         return new MyHolder(binding);
 
 
@@ -47,19 +47,24 @@ public class FeatureAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         MyHolder myHolder = (MyHolder) holder;
 
-        myHolder.binding.setModel(list.get(position));
+        if (list.size()>0)
+        {
+            int pos = position%list.size();
+            myHolder.binding.setModel(list.get(pos));
+        }
+
 
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return Integer.MAX_VALUE;
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
-        public FeatureRowBinding binding;
+        public SponsorRowBinding binding;
 
-        public MyHolder(@NonNull FeatureRowBinding binding) {
+        public MyHolder(@NonNull SponsorRowBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 

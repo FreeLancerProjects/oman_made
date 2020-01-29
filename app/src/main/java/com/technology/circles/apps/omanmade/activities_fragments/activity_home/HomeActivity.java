@@ -35,6 +35,7 @@ import com.technology.circles.apps.omanmade.activities_fragments.activity_home.f
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Industry;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Sponsor;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_packages.PackagesActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_peie.PeieActivity;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
 
@@ -284,6 +285,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         cardViewDirectory.setOnClickListener(view -> {
+            arrow1.animate().rotationBy(-180).setDuration(500).start();
 
             expandLayoutHome.collapse(true);
             new Handler()
@@ -320,7 +322,7 @@ public class HomeActivity extends AppCompatActivity {
                     .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
 
 
-            new Handler().postDelayed(this::navigatePeieActivity, 1000);
+            new Handler().postDelayed(this::navigateToPeieActivity, 1000);
         });
         cardViewFaq.setOnClickListener(v -> {
             arrow3.animate().rotationBy(-180).setDuration(500).start();
@@ -333,9 +335,26 @@ public class HomeActivity extends AppCompatActivity {
 
 
         });
+
+        cardViewPackage.setOnClickListener(v -> {
+
+            arrow2.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutAbout.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler().postDelayed(this::navigateToPackageActivity, 1000);
+        });
     }
 
-    private void navigatePeieActivity() {
+    private void navigateToPackageActivity() {
+
+        Intent intent = new Intent(HomeActivity.this, PackagesActivity.class);
+        startActivity(intent);
+    }
+
+    private void navigateToPeieActivity() {
         Intent intent = new Intent(HomeActivity.this, PeieActivity.class);
         startActivity(intent);
     }
