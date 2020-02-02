@@ -3,13 +3,16 @@ package com.technology.circles.apps.omanmade.activities_fragments.activity_home;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,13 +40,22 @@ import com.technology.circles.apps.omanmade.activities_fragments.activity_home.f
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Sponsor;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_packages.PackagesActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_peie.PeieActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_service.ServiceActivity;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_web_view.WebViewActivity;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
+import com.technology.circles.apps.omanmade.models.AppDataModel;
+import com.technology.circles.apps.omanmade.remote.Api;
+import com.technology.circles.apps.omanmade.tags.Tags;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
+import java.io.IOException;
 import java.util.List;
 
 import io.paperdb.Paper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -57,10 +69,11 @@ public class HomeActivity extends AppCompatActivity {
     private Fragment_Industry fragment_industry;
     private Fragment_Sponsor fragment_sponsor;
     private String lang;
+    private AppDataModel appDataModel;
     ///////////////////////////////////////////////////
     private CardView cardViewMainHome, cardViewHome, cardViewDirectory, cardViewCreateList, cardViewProfile,
             cardViewMainAbout, cardViewCatalogue, cardViewService, cardViewPackage, cardViewAbout, cardViewPeie,
-            cardViewMainSupport, cardViewFaq, cardViewContact, cardViewSetting,
+            cardViewMainSupport, cardViewFaq, cardViewContact,
             cardViewMainLegal, cardViewPrivacy, cardViewTerms;
 
     private ImageView arrow1, arrow2, arrow3, arrow4, imgFacebook, imgIntagram, imgWhatsApp, imgTwitter;
@@ -114,7 +127,6 @@ public class HomeActivity extends AppCompatActivity {
         cardViewMainSupport = findViewById(R.id.cardViewMainSupport);
         cardViewFaq = findViewById(R.id.cardViewFaq);
         cardViewContact = findViewById(R.id.cardViewContact);
-        cardViewSetting = findViewById(R.id.cardViewSetting);
         cardViewMainLegal = findViewById(R.id.cardViewMainLegal);
         cardViewPrivacy = findViewById(R.id.cardViewPrivacy);
         cardViewTerms = findViewById(R.id.cardViewTerms);
@@ -261,8 +273,8 @@ public class HomeActivity extends AppCompatActivity {
 
         cardViewContact.setOnClickListener(view -> {
 
-            arrow4.animate().rotationBy(-180).setDuration(500).start();
-            expandLayoutLegal.collapse(true);
+            arrow3.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutSupport.collapse(true);
             new Handler()
                     .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
 
@@ -296,6 +308,55 @@ public class HomeActivity extends AppCompatActivity {
 
 
         });
+
+        cardViewCreateList.setOnClickListener(view -> {
+            arrow1.animate().rotationBy(-180).setDuration(500).start();
+
+            expandLayoutHome.collapse(true);
+            new Handler()
+                    .postDelayed(() ->drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler()
+                    .postDelayed(() -> {
+                        String url;
+                        if (lang.equals("ar"))
+                        {
+                            url = "https://www.omanmade.com/ar/ar-create/";
+                        }else
+                        {
+                            url = "https://www.omanmade.com/create/";
+                        }
+                        Intent intent = new Intent(HomeActivity.this, WebViewActivity.class);
+                        intent.putExtra("url",url);
+                        startActivity(intent);
+                    },1000);
+
+
+        });
+
+        cardViewProfile.setOnClickListener(view -> {
+            arrow1.animate().rotationBy(-180).setDuration(500).start();
+
+            expandLayoutHome.collapse(true);
+
+            new Handler()
+                    .postDelayed(() ->drawer.closeDrawer(GravityCompat.START),500);
+
+            new Handler()
+                    .postDelayed(() -> {
+
+                        String url ="https://www.omanmade.com/ar/ar-profile/";
+
+                        Intent intent = new Intent(HomeActivity.this, WebViewActivity.class);
+                        intent.putExtra("url",url);
+                        startActivity(intent);
+
+                    }, 1000);
+
+
+        });
+
         cardViewAbout.setOnClickListener(v -> {
             arrow2.animate().rotationBy(-180).setDuration(500).start();
             expandLayoutAbout.collapse(true);
@@ -304,7 +365,33 @@ public class HomeActivity extends AppCompatActivity {
 
 
             new Handler()
-                    .postDelayed(this::navigateToAboutActivity, 1000);
+                    .postDelayed(()->navigateToAboutActivity(1), 1000);
+
+
+        });
+
+        cardViewPrivacy.setOnClickListener(v -> {
+            arrow4.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutLegal.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler()
+                    .postDelayed(()->navigateToAboutActivity(2), 1000);
+
+
+        });
+
+        cardViewTerms.setOnClickListener(v -> {
+            arrow4.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutLegal.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler()
+                    .postDelayed(()->navigateToAboutActivity(3), 1000);
 
 
         });
@@ -346,6 +433,140 @@ public class HomeActivity extends AppCompatActivity {
 
             new Handler().postDelayed(this::navigateToPackageActivity, 1000);
         });
+
+
+        cardViewService.setOnClickListener(v -> {
+
+            arrow2.animate().rotationBy(-180).setDuration(500).start();
+            expandLayoutAbout.collapse(true);
+            new Handler()
+                    .postDelayed(() -> drawer.closeDrawer(GravityCompat.START), 500);
+
+
+            new Handler().postDelayed(this::navigateToServiceActivity, 1000);
+        });
+
+        imgFacebook.setOnClickListener(view -> {
+            drawer.closeDrawer(GravityCompat.START);
+            if (appDataModel!=null&&!appDataModel.getFacebook().isEmpty()){
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(appDataModel.getFacebook()));
+                startActivity(intent);
+            }else
+                {
+                    Toast.makeText(this, R.string.not_av, Toast.LENGTH_SHORT).show();
+                }
+
+        });
+
+        imgIntagram.setOnClickListener(view -> {
+            drawer.closeDrawer(GravityCompat.START);
+
+            if (appDataModel!=null&&!appDataModel.getInstagram().isEmpty()){
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(appDataModel.getInstagram()));
+                startActivity(intent);
+            }else
+            {
+                Toast.makeText(this, R.string.not_av, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+        imgTwitter.setOnClickListener(view -> {
+            drawer.closeDrawer(GravityCompat.START);
+
+            if (appDataModel!=null&&!appDataModel.getTwitter().isEmpty()){
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(appDataModel.getTwitter()));
+                startActivity(intent);
+            }else
+            {
+                Toast.makeText(this, R.string.not_av, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+        imgWhatsApp.setOnClickListener(view -> {
+            drawer.closeDrawer(GravityCompat.START);
+
+            if (appDataModel!=null&&!appDataModel.getMob_number1().isEmpty()){
+
+                String phone = appDataModel.getMob_number1().replace("(","").replace(")","").replaceAll("_","");
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone="+phone));
+                startActivity(intent);
+            }else
+            {
+                Toast.makeText(this, R.string.not_av, Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+        tvRate.setOnClickListener(view -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName())));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName())));
+            }
+
+        });
+
+        getAbout();
+    }
+
+
+    private void getAbout() {
+
+        Api.getService(Tags.base_url2)
+                .getSetting(lang)
+                .enqueue(new Callback<AppDataModel>() {
+                    @Override
+                    public void onResponse(Call<AppDataModel> call, Response<AppDataModel> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            appDataModel = response.body();
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            if (response.code() == 500) {
+                                Toast.makeText(HomeActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(HomeActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AppDataModel> call, Throwable t) {
+                        try {
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(HomeActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(HomeActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+    }
+
+
+    private void navigateToServiceActivity() {
+
+        Intent intent = new Intent(HomeActivity.this, ServiceActivity.class);
+        startActivity(intent);
     }
 
     private void navigateToPackageActivity() {
@@ -359,8 +580,9 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void navigateToAboutActivity() {
+    private void navigateToAboutActivity(int type) {
         Intent intent = new Intent(HomeActivity.this, AboutActivity.class);
+        intent.putExtra("type",type);
         startActivity(intent);
     }
 

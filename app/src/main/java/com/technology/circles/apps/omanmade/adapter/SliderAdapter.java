@@ -2,6 +2,7 @@ package com.technology.circles.apps.omanmade.adapter;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,11 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.models.SliderModel;
+import com.technology.circles.apps.omanmade.tags.Tags;
 
 import java.util.List;
 
@@ -38,8 +42,8 @@ public class SliderAdapter extends PagerAdapter {
         ImageView image = view.findViewById(R.id.image);
         ProgressBar progressBar = view.findViewById(R.id.progBar);
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(context,R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
-        //Uri path = Uri.parse(Tags.IMAGE+list.get(position).getImage());
-        /*Picasso.with(context).load(path).fit().into(image, new Callback() {
+        Uri path = Uri.parse(Tags.IMAGE_URL_SLIDER+list.get(position).getImage());
+        Picasso.with(context).load(path).fit().into(image, new Callback() {
             @Override
             public void onSuccess() {
                 progressBar.setVisibility(View.GONE);
@@ -49,7 +53,7 @@ public class SliderAdapter extends PagerAdapter {
             public void onError() {
 
             }
-        });*/
+        });
         container.addView(view);
         return view;
 

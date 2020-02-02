@@ -10,19 +10,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
-import com.technology.circles.apps.omanmade.databinding.SponsorRowBinding;
-import com.technology.circles.apps.omanmade.models.SponsorsModel;
+import com.technology.circles.apps.omanmade.databinding.IndustrialAreaRow2Binding;
+import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
 
 import java.util.List;
 
-public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class IndustrialAreaAdapter2 extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<SponsorsModel.Sponsors> list;
+    private List<IndustrialAreaDataModel.IndustrialAreaModel> list;
     private Context context;
     private LayoutInflater inflater;
     private Fragment fragment;
 
-    public SponsorAdapter(List<SponsorsModel.Sponsors> list, Context context, Fragment fragment) {
+    public IndustrialAreaAdapter2(List<IndustrialAreaDataModel.IndustrialAreaModel> list, Context context, Fragment fragment) {
         this.list = list;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -36,7 +36,7 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
 
-        SponsorRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.sponsor_row, parent, false);
+        IndustrialAreaRow2Binding binding = DataBindingUtil.inflate(inflater, R.layout.industrial_area_row2, parent, false);
         return new MyHolder(binding);
 
 
@@ -49,8 +49,6 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         myHolder.binding.setModel(list.get(position));
 
-
-
     }
 
     @Override
@@ -59,9 +57,9 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
-        public SponsorRowBinding binding;
+        public IndustrialAreaRow2Binding binding;
 
-        public MyHolder(@NonNull SponsorRowBinding binding) {
+        public MyHolder(@NonNull IndustrialAreaRow2Binding binding) {
             super(binding.getRoot());
             this.binding = binding;
 

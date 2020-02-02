@@ -2,7 +2,6 @@ package com.technology.circles.apps.omanmade.activities_fragments.activity_home.
 
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,21 +13,26 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.HomeActivity;
 import com.technology.circles.apps.omanmade.adapter.FeatureListingAdapter;
+import com.technology.circles.apps.omanmade.adapter.FeaturedCategoryAdapter;
+import com.technology.circles.apps.omanmade.adapter.IndustrialAreaAdapter;
 import com.technology.circles.apps.omanmade.adapter.SliderAdapter;
 import com.technology.circles.apps.omanmade.adapter.SponsorAdapter;
 import com.technology.circles.apps.omanmade.databinding.FragmentHomeBinding;
 import com.technology.circles.apps.omanmade.models.FeatureListingDataModel;
+import com.technology.circles.apps.omanmade.models.FeaturedCategoryDataModel;
+import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
 import com.technology.circles.apps.omanmade.models.SliderModel;
 import com.technology.circles.apps.omanmade.models.SponsorsModel;
 import com.technology.circles.apps.omanmade.preferences.Preferences;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.tags.Tags;
+import com.yarolegovich.discretescrollview.transform.Pivot;
+import com.yarolegovich.discretescrollview.transform.ScaleTransformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,9 +55,12 @@ public class Fragment_Home extends Fragment {
     private SliderAdapter sliderAdapter;
     private SponsorAdapter sponsorAdapter;
     private List<SponsorsModel.Sponsors> sponsorsList;
+    private List<IndustrialAreaDataModel.IndustrialAreaModel> industrialAreaModelList;
+    private IndustrialAreaAdapter industrialAreaAdapter;
+    private List<FeaturedCategoryDataModel.FeaturedCategoryModel> featuredCategoryModelList;
+    private FeaturedCategoryAdapter featuredCategoryAdapter;
     private Timer timer,timer2;
     private TimerTask timerTask,timerTask2;
-    private int item = 0;
 
 
 
@@ -75,6 +82,8 @@ public class Fragment_Home extends Fragment {
     private void initView() {
         sponsorsList = new ArrayList<>();
         featureModelList = new ArrayList<>();
+        industrialAreaModelList = new ArrayList<>();
+        featuredCategoryModelList = new ArrayList<>();
         activity = (HomeActivity) getActivity();
         preferences = Preferences.newInstance();
         Paper.init(activity);
@@ -82,23 +91,16 @@ public class Fragment_Home extends Fragment {
         binding.progBarSlider.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.progBarSponsor.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.progBarFeature.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        binding.progBarIndustrialArea.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+
         binding.recViewFeature.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false) {
-            @Override
-            public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-                LinearSmoothScroller smoothScroller = new LinearSmoothScroller(activity) {
-                    private static final float SPEED = 25f;// Change this value (default=25f)
-                    @Override
-                    protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
-                        return SPEED / displayMetrics.densityDpi;
-                    }
-                };
-                smoothScroller.setTargetPosition(position);
-                startSmoothScroll(smoothScroller);
-            }
-
-        };
+        binding.recViewSponsor.setItemTransformer(new ScaleTransformer.Builder()
+                .setMaxScale(1.00f)
+                .setMinScale(0.8f)
+                .setPivotX(Pivot.X.CENTER) // CENTER is a default one
+                .setPivotY(Pivot.Y.BOTTOM) // CENTER is a default one
+                .build());
 
         binding.recViewSponsor.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -108,19 +110,24 @@ public class Fragment_Home extends Fragment {
             }
         });
 
-        binding.recViewSponsor.setLayoutManager(layoutManager);
 
         featureListingAdapter = new FeatureListingAdapter(featureModelList,activity,this);
         binding.recViewFeature.setAdapter(featureListingAdapter);
 
 
+        binding.recViewIndustrialArea.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
+        industrialAreaAdapter = new IndustrialAreaAdapter(industrialAreaModelList,activity,this);
+        binding.recViewIndustrialArea.setAdapter(industrialAreaAdapter);
 
-
+        binding.recViewCategory.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
+        featuredCategoryAdapter = new FeaturedCategoryAdapter(featuredCategoryModelList,activity,this);
+        binding.recViewCategory.setAdapter(featuredCategoryAdapter);
 
         getSlider();
         getSponsor();
         getFeature();
-
+        getIndustrialArea();
+        getFeaturedCategory();
 
 
 
@@ -293,6 +300,7 @@ public class Fragment_Home extends Fragment {
 
                                 sponsorAdapter = new SponsorAdapter(sponsorsList,activity,Fragment_Home.this);
                                 binding.recViewSponsor.setAdapter(sponsorAdapter);
+                                binding.recViewSponsor.setItemTransitionTimeMillis(500);
 
                                  binding.tvNoData1.setVisibility(View.GONE);
 
@@ -352,6 +360,139 @@ public class Fragment_Home extends Fragment {
 
     }
 
+    private void getIndustrialArea() {
+
+        Api.getService(Tags.base_url2).
+                getIndustrialArea(lang).
+                enqueue(new Callback<IndustrialAreaDataModel>() {
+                    @Override
+                    public void onResponse(Call<IndustrialAreaDataModel> call, Response<IndustrialAreaDataModel> response) {
+                        binding.progBarIndustrialArea.setVisibility(View.GONE);
+
+                        if (response.isSuccessful() && response.body() != null&&response.body().getIndustrialAreas()!=null) {
+
+                            industrialAreaModelList.clear();
+                            industrialAreaModelList.addAll(response.body().getIndustrialAreas());
+                            if (industrialAreaModelList.size()>0)
+                            {
+                                industrialAreaAdapter.notifyDataSetChanged();
+                                binding.tvNoData4.setVisibility(View.GONE);
+                            }else
+                            {
+                                binding.tvNoData4.setVisibility(View.VISIBLE);
+
+                            }
+
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<IndustrialAreaDataModel> call, Throwable t) {
+                        binding.progBarFeature.setVisibility(View.GONE);
+                        try {
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+
+    }
+
+    private void getFeaturedCategory() {
+
+        Api.getService(Tags.base_url2).
+                getFeaturedCategory(lang).
+                enqueue(new Callback<FeaturedCategoryDataModel>() {
+                    @Override
+                    public void onResponse(Call<FeaturedCategoryDataModel> call, Response<FeaturedCategoryDataModel> response) {
+                        binding.progBarCategory.setVisibility(View.GONE);
+
+                        if (response.isSuccessful() && response.body() != null&&response.body().getFeatured_cats()!=null) {
+
+                            featuredCategoryModelList.clear();
+                            featuredCategoryModelList.addAll(response.body().getFeatured_cats());
+                            if (featuredCategoryModelList.size()>0)
+                            {
+                                featuredCategoryAdapter.notifyDataSetChanged();
+                                binding.tvNoData3.setVisibility(View.GONE);
+                            }else
+                            {
+                                binding.tvNoData3.setVisibility(View.VISIBLE);
+
+                            }
+
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<FeaturedCategoryDataModel> call, Throwable t) {
+                        binding.progBarCategory.setVisibility(View.GONE);
+                        try {
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+
+    }
+
+
     private class MyTimerTask extends TimerTask{
         @Override
         public void run() {
@@ -370,9 +511,34 @@ public class Fragment_Home extends Fragment {
     private class MyTimerTask2 extends TimerTask{
         @Override
         public void run() {
+
+
             activity.runOnUiThread(() -> {
-                item+=1;
-                binding.recViewSponsor.smoothScrollToPosition(item);
+
+
+                if (binding.recViewSponsor.getCurrentItem()<sponsorsList.size()-1)
+                {
+                    try {
+                        int item = binding.recViewSponsor.getCurrentItem()+1;
+                        binding.recViewSponsor.smoothScrollToPosition(item);
+                    }catch (Exception e){}
+
+
+
+
+
+                }else
+                    {
+                        timerTask2.cancel();
+                        timer2.cancel();
+                        timer2.purge();
+
+                        binding.recViewSponsor.postDelayed(() -> binding.recViewSponsor.smoothScrollToPosition(0),1000);
+
+                        timer2 = new Timer();
+                        timerTask2 = new MyTimerTask2();
+                        timer2.scheduleAtFixedRate(timerTask2,0,500);
+                    }
             });
         }
     }

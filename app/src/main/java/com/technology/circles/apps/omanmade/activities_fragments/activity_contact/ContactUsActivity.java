@@ -22,6 +22,7 @@ import com.technology.circles.apps.omanmade.databinding.ActivityContactUsBinding
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
 import com.technology.circles.apps.omanmade.models.AppDataModel;
+import com.technology.circles.apps.omanmade.models.ContactUsModel;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.share.Common;
 import com.technology.circles.apps.omanmade.tags.Tags;
@@ -29,15 +30,17 @@ import com.technology.circles.apps.omanmade.tags.Tags;
 import java.io.IOException;
 
 import io.paperdb.Paper;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ContactUsActivity extends AppCompatActivity implements Listeners.BackListener , OnMapReadyCallback {
+public class ContactUsActivity extends AppCompatActivity implements Listeners.BackListener , OnMapReadyCallback , Listeners.ContactListener {
     private ActivityContactUsBinding binding;
     private String lang;
     private FragmentMapTouchListener fragment;
     private GoogleMap mMap;
+    private ContactUsModel contactUsModel;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -53,10 +56,14 @@ public class ContactUsActivity extends AppCompatActivity implements Listeners.Ba
     }
 
     private void initView() {
+        contactUsModel = new ContactUsModel();
         Paper.init(this);
         lang = Paper.book().read("lang","ar");
         binding.setLang(lang);
+        binding.setContactModel(contactUsModel);
         binding.setBackListener(this);
+        binding.setContactListener(this);
+
         initMap();
         getAppData();
     }
@@ -157,5 +164,81 @@ public class ContactUsActivity extends AppCompatActivity implements Listeners.Ba
     {
         mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lng)).title(title).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lng),13.5f));
+    }
+
+    @Override
+    public void sendContact(ContactUsModel contactUsModel) {
+
+        if (contactUsModel.isDataValid(this))
+        {
+            Common.CloseKeyBoard(this,binding.edtMsg);
+
+            send(contactUsModel);
+
+
+
+        }
+    }
+
+    private void send(ContactUsModel contactUsModel) {
+
+        ProgressDialog dialog = Common.createProgressDialog(this, getString(R.string.wait));
+        dialog.setCancelable(false);
+        dialog.show();
+        try {
+
+            Api.getService(Tags.base_url2)
+                    .getSendContact(contactUsModel.getName(),contactUsModel.getEmail(),contactUsModel.getSubject(),contactUsModel.getMessage())
+                    .enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            dialog.dismiss();
+                            if (response.isSuccessful() && response.body() != null) {
+
+                                Toast.makeText(ContactUsActivity.this, getString(R.string.suc), Toast.LENGTH_SHORT).show();
+                                finish();
+
+                            } else {
+
+                                try {
+
+                                    Log.e("error", response.code() + "_" + response.errorBody().string());
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                if (response.code() == 500) {
+                                    Toast.makeText(ContactUsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                                }  else {
+                                    Toast.makeText(ContactUsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            try {
+                                dialog.dismiss();
+                                if (t.getMessage() != null) {
+                                    Log.e("error", t.getMessage());
+                                    if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                        Toast.makeText(ContactUsActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(ContactUsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+        } catch (Exception e) {
+            dialog.dismiss();
+
+        }
     }
 }

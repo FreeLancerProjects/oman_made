@@ -59,5 +59,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.jpardogo.listbuddies:library:1.1.1'
+    implementation 'com.yarolegovich:discrete-scrollview:1.4.9'
+    implementation 'org.jsoup:jsoup:1.12.1'
 
 }

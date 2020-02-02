@@ -19,6 +19,13 @@
         <variable
             name="backListener"
             type="com.technology.circles.apps.omanmade.interfaces.Listeners.BackListener" />
+
+        <variable
+            name="contactModel"
+            type="com.technology.circles.apps.omanmade.models.ContactUsModel" />
+        <variable
+            name="contactListener"
+            type="com.technology.circles.apps.omanmade.interfaces.Listeners.ContactListener" />
     </data>
     <ScrollView
         android:id="@+id/scrollView"
@@ -437,6 +444,8 @@
                             android:textSize="14sp"
                             android:textColor="@color/black"
                             android:background="@color/white"
+                            android:text="@={contactModel.name}"
+                            error="@{contactModel.error_name}"
                             />
                     </LinearLayout>
 
@@ -470,6 +479,8 @@
                             android:textColor="@color/black"
                             android:background="@color/white"
                             android:inputType="textEmailAddress"
+                            android:text="@={contactModel.email}"
+                            error="@{contactModel.error_email}"
                             />
                     </LinearLayout>
 
@@ -502,10 +513,13 @@
                             android:textSize="14sp"
                             android:textColor="@color/black"
                             android:background="@color/white"
+                            android:text="@={contactModel.subject}"
+                            error="@{contactModel.error_subject}"
                             />
                     </LinearLayout>
 
                     <EditText
+                        android:id="@+id/edtMsg"
                         android:layout_width="match_parent"
                         android:layout_height="150dp"
                         android:singleLine="true"
@@ -518,6 +532,8 @@
                         android:layout_marginTop="8dp"
                         android:gravity="top"
                         android:inputType="textMultiLine"
+                        android:text="@={contactModel.message}"
+                        error="@{contactModel.error_message}"
                         />
 
 
@@ -530,6 +546,7 @@
                         android:textColor="@color/white"
                         android:textSize="15sp"
                         android:text="@string/send"
+                        android:onClick="@{()->contactListener.sendContact(contactModel)}"
                         />
 
 

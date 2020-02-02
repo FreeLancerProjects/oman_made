@@ -18,6 +18,9 @@
         <variable
             name="lang"
             type="String" />
+        <variable
+            name="type"
+            type="Integer" />
 
     </data>
 
@@ -78,7 +81,7 @@
                             android:layout_marginEnd="8dp"
                             android:textColor="@color/black"
                             android:textSize="15sp"
-                            android:text="@string/about_oman_made"
+                            android:text='@{type==1?@string/about_oman_made:(type==2?@string/privacy_policy:@string/terms_and_conditions)}'
                             android:textStyle="bold"
                             android:clickable="false"
                             android:longClickable="false"
@@ -120,7 +123,7 @@
                             android:layout_gravity="center"
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="8dp"
-                            android:text="@{model.about}"
+                            android:text="@{type==1?model.about:(type==2?model.privacy:model.terms)}"
                             android:textColor="@color/black"
                             android:textSize="13sp"
                             android:padding="8dp"

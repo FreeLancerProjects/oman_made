@@ -10,19 +10,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
-import com.technology.circles.apps.omanmade.databinding.SponsorRowBinding;
-import com.technology.circles.apps.omanmade.models.SponsorsModel;
+import com.technology.circles.apps.omanmade.databinding.FeaturedCategoryRowBinding;
+import com.technology.circles.apps.omanmade.models.FeaturedCategoryDataModel;
 
 import java.util.List;
 
-public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class FeaturedCategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<SponsorsModel.Sponsors> list;
+    private List<FeaturedCategoryDataModel.FeaturedCategoryModel> list;
     private Context context;
     private LayoutInflater inflater;
     private Fragment fragment;
 
-    public SponsorAdapter(List<SponsorsModel.Sponsors> list, Context context, Fragment fragment) {
+    public FeaturedCategoryAdapter(List<FeaturedCategoryDataModel.FeaturedCategoryModel> list, Context context, Fragment fragment) {
         this.list = list;
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -36,7 +36,7 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
 
-        SponsorRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.sponsor_row, parent, false);
+        FeaturedCategoryRowBinding binding = DataBindingUtil.inflate(inflater, R.layout.featured_category_row, parent, false);
         return new MyHolder(binding);
 
 
@@ -59,9 +59,9 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
-        public SponsorRowBinding binding;
+        public FeaturedCategoryRowBinding binding;
 
-        public MyHolder(@NonNull SponsorRowBinding binding) {
+        public MyHolder(@NonNull FeaturedCategoryRowBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
 

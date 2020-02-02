@@ -65,5 +65,9 @@
     <string name="listings">Featured <font color='#33bcc2'> Listings</font></string>
     <string name="feat_cat">Featured <font color='#33bcc2'> Categories</font></string>
 
+    <string name="field_req">Field required</string>
+    <string name="inv_email">Invalid email</string>
+    <string name="not_av">Not available now</string>
+    <string name="industrial_area">Industrial <font color='#33bcc2'>Area</font></string>
 
 </resources>

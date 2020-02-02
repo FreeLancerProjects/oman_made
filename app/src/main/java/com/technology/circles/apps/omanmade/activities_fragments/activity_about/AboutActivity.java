@@ -1,6 +1,7 @@
 package com.technology.circles.apps.omanmade.activities_fragments.activity_about;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ import retrofit2.Response;
 public class AboutActivity extends AppCompatActivity implements Listeners.BackListener {
     private ActivityAboutBinding binding;
     private String lang;
+    private int type=1;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -42,8 +44,19 @@ public class AboutActivity extends AppCompatActivity implements Listeners.BackLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_about);
+        getDataFromIntent();
         initView();
 
+    }
+
+    private void getDataFromIntent() {
+
+        Intent intent = getIntent();
+        if (intent!=null&&intent.hasExtra("type"))
+        {
+            type = intent.getIntExtra("type",1);
+
+        }
     }
 
 
@@ -53,6 +66,7 @@ public class AboutActivity extends AppCompatActivity implements Listeners.BackLi
         lang = Paper.book().read("lang", Locale.getDefault().getLanguage());
         binding.setLang(lang);
         binding.setBackListener(this);
+        binding.setType(type);
         binding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         getAbout();
 
