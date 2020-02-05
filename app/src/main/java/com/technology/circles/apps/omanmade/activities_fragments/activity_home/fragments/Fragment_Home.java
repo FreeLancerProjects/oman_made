@@ -21,11 +21,13 @@ import com.technology.circles.apps.omanmade.adapter.FeatureListingAdapter;
 import com.technology.circles.apps.omanmade.adapter.FeaturedCategoryAdapter;
 import com.technology.circles.apps.omanmade.adapter.IndustrialAreaAdapter;
 import com.technology.circles.apps.omanmade.adapter.SliderAdapter;
+import com.technology.circles.apps.omanmade.adapter.SpinnerLocationAdapter;
 import com.technology.circles.apps.omanmade.adapter.SponsorAdapter;
 import com.technology.circles.apps.omanmade.databinding.FragmentHomeBinding;
 import com.technology.circles.apps.omanmade.models.FeatureListingDataModel;
 import com.technology.circles.apps.omanmade.models.FeaturedCategoryDataModel;
 import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
+import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.models.SliderModel;
 import com.technology.circles.apps.omanmade.models.SponsorsModel;
 import com.technology.circles.apps.omanmade.preferences.Preferences;
@@ -59,6 +61,14 @@ public class Fragment_Home extends Fragment {
     private IndustrialAreaAdapter industrialAreaAdapter;
     private List<FeaturedCategoryDataModel.FeaturedCategoryModel> featuredCategoryModelList;
     private FeaturedCategoryAdapter featuredCategoryAdapter;
+    private List<SpinnerModel> spinnerLocationModelList,spinnerCategoryListingModelList;
+
+    private List<SpinnerModel> selectedListingModelList;
+
+    private SpinnerLocationAdapter spinnerLocationAdapter,spinnerCategoryListingAdapter;
+    private final int arLangCode = 732,enLangCode=730;
+    private int selectedLangCode = arLangCode;
+
     private Timer timer,timer2;
     private TimerTask timerTask,timerTask2;
 
@@ -80,10 +90,15 @@ public class Fragment_Home extends Fragment {
     }
 
     private void initView() {
+
+        spinnerCategoryListingModelList = new ArrayList<>();
+        selectedListingModelList = new ArrayList<>();
+        spinnerLocationModelList = new ArrayList<>();
         sponsorsList = new ArrayList<>();
         featureModelList = new ArrayList<>();
         industrialAreaModelList = new ArrayList<>();
         featuredCategoryModelList = new ArrayList<>();
+
         activity = (HomeActivity) getActivity();
         preferences = Preferences.newInstance();
         Paper.init(activity);
@@ -123,11 +138,43 @@ public class Fragment_Home extends Fragment {
         featuredCategoryAdapter = new FeaturedCategoryAdapter(featuredCategoryModelList,activity,this);
         binding.recViewCategory.setAdapter(featuredCategoryAdapter);
 
+
+        //////////////////////////
+
+        if (lang.equals("ar"))
+        {
+            selectedLangCode = arLangCode;
+
+            spinnerLocationModelList.add(new SpinnerModel(0,"إختر",arLangCode));
+
+            selectedListingModelList.add(new SpinnerModel(0,"إختر",arLangCode));
+
+        }else
+            {
+                selectedLangCode = enLangCode;
+
+                spinnerLocationModelList.add(new SpinnerModel(0,"Choose",enLangCode));
+
+                selectedListingModelList.add(new SpinnerModel(0,"Choose",arLangCode));
+
+            }
+
+        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList,activity);
+        binding.spinnerLocation.setAdapter(spinnerLocationAdapter);
+
+        spinnerCategoryListingAdapter = new SpinnerLocationAdapter(selectedListingModelList,activity);
+        binding.spinnerCategoryListing.setAdapter(spinnerCategoryListingAdapter);
+
+
+        ///////////////////////////
+
         getSlider();
         getSponsor();
         getFeature();
         getIndustrialArea();
         getFeaturedCategory();
+        getLocation();
+        getCategoryListing();
 
 
 
@@ -492,6 +539,172 @@ public class Fragment_Home extends Fragment {
 
     }
 
+    private void getLocation() {
+
+        Api.getService(Tags.base_url1).
+                getLocation(selectedLangCode).
+                enqueue(new Callback<List<SpinnerModel>>() {
+                    @Override
+                    public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            if (response.body().size()>0)
+                            {
+                                spinnerLocationModelList.addAll(response.body());
+                                activity.runOnUiThread(()->{
+                                    spinnerLocationAdapter.notifyDataSetChanged();
+                                });
+                            }
+
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
+                        try {
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+
+    }
+
+    private void getCategoryListing() {
+
+        Api.getService(Tags.base_url1).
+                getListingCategory().
+                enqueue(new Callback<List<SpinnerModel>>() {
+                    @Override
+                    public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            if (response.body().size()>0)
+                            {
+                                spinnerCategoryListingModelList.addAll(response.body());
+                                updateSpinnerCategoryListing(spinnerCategoryListingModelList);
+                            }
+
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
+                        try {
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+
+    }
+
+    private void updateSpinnerCategoryListing(List<SpinnerModel> spinnerCategoryListingModelList) {
+
+
+        if (spinnerCategoryListingModelList.size()>0)
+        {
+            if (lang.equals("ar"))
+            {
+                selectedListingModelList.addAll(getArCategoryListing());
+                spinnerCategoryListingAdapter.notifyDataSetChanged();
+            }else
+                {
+                    selectedListingModelList.addAll(getEnCategoryListing());
+                    spinnerCategoryListingAdapter.notifyDataSetChanged();
+                }
+
+
+        }
+    }
+
+    private List<SpinnerModel> getArCategoryListing()
+    {
+        List<SpinnerModel> spinnerModelList = new ArrayList<>();
+        int end = spinnerCategoryListingModelList.size()/2;
+
+        for (int i =0; i<end;i++)
+        {
+            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+        }
+
+        return spinnerModelList;
+    }
+
+
+    private List<SpinnerModel> getEnCategoryListing()
+    {
+        List<SpinnerModel> spinnerModelList = new ArrayList<>();
+        int start = spinnerCategoryListingModelList.size()/2;
+
+        for (int i =start; i<spinnerCategoryListingModelList.size();i++)
+        {
+            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+        }
+
+        return spinnerModelList;
+    }
+
+
+
 
     private class MyTimerTask extends TimerTask{
         @Override
@@ -543,36 +756,7 @@ public class Fragment_Home extends Fragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (timer2!=null)
-        {
-            timer2.purge();
-            timer2.cancel();
 
-        }
-
-        if (timerTask2!=null)
-        {
-            timerTask2.cancel();
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (timer2!=null)
-        {
-            if (sponsorsList.size()>1)
-            {
-                timer2 = new Timer();
-                timerTask2 = new MyTimerTask2();
-                timer2.scheduleAtFixedRate(timerTask2,0,1);
-
-            }
-        }
-    }
 
     @Override
     public void onDestroy() {

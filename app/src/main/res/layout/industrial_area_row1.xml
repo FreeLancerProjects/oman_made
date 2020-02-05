@@ -53,6 +53,8 @@
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:text='@{model.name??""}'
+                    android:maxLines="2"
+                    android:ellipsize="end"
                     />
 
             </androidx.cardview.widget.CardView>

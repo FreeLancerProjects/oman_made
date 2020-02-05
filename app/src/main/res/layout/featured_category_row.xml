@@ -43,6 +43,8 @@
                 android:gravity="center"
                 android:layout_marginBottom="5dp"
                 android:text='@{model.name??""}'
+                android:maxLines="2"
+                android:ellipsize="end"
                 />
 
         </LinearLayout>

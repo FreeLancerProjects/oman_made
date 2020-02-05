@@ -76,5 +76,8 @@
     <string name="inv_email">البريد الالكتروني غير صحيح</string>
     <string name="not_av">غير متاح الان</string>
     <string name="industrial_area">المناطق <font color='#33bcc2'>الصناعية</font> </string>
+    <string name="listing_match_your_search">نتائج البحث</string>
+    <string name="no_image">لايوجد صورة</string>
+    <string name="clear">حذف النتائج</string>
 
 </resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.technology.circles.apps.omanmade.models.BusinessDataModel" />
+
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="3dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="3dp"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+                <com.makeramen.roundedimageview.RoundedImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/gray4"
+                    app:riv_corner_radius_top_left="8dp"
+                    app:riv_corner_radius_top_right="8dp"
+                    app:riv_border_width="0dp"
+                    app:riv_mutate_background="true"
+                    mediaImage="@{model.imagePath}"
+
+                    />
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:visibility="@{model.featured_media==0?View.VISIBLE:View.GONE,default=gone}"
+
+                    >
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_image"
+                        android:tint="@color/gray5"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="@color/gray5"
+                        android:text="@string/no_image"
+                        />
+                </LinearLayout>
+            </FrameLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text='@{model.title.rendered??""}'
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -308,6 +308,40 @@ public class UI_General_Method {
 
     }
 
+    @BindingAdapter("mediaImage")
+    public static void mediaImage(View view,String path)
+    {
+        if (view instanceof CircleImageView)
+        {
+            CircleImageView imageView = (CircleImageView) view;
+
+            if (path!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(path)).fit().into(imageView);
+            }
+        }else if (view instanceof RoundedImageView)
+        {
+            RoundedImageView imageView = (RoundedImageView) view;
+
+            if (path!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(path)).fit().into(imageView);
+            }
+        }else if (view instanceof ImageView)
+        {
+            ImageView imageView = (ImageView) view;
+
+            if (path!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(path)).fit().into(imageView);
+            }
+        }
+
+    }
+
 
 
 

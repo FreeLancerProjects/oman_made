@@ -15,6 +15,7 @@
             app:riv_border_width="0dp"
             app:riv_corner_radius="8dp"
             android:background="@color/white"
+            android:scaleType="fitXY"
             />
         <ProgressBar
             android:id="@+id/progBar"
