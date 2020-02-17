@@ -80,7 +80,7 @@ public class UI_General_Method {
             if (endPoint!=null)
             {
 
-                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).fit().into(imageView);
+                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).into(imageView);
             }
         }else if (view instanceof RoundedImageView)
         {
@@ -89,7 +89,7 @@ public class UI_General_Method {
             if (endPoint!=null)
             {
 
-                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).fit().into(imageView);
+                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).into(imageView);
             }
         }else if (view instanceof ImageView)
         {
@@ -98,7 +98,7 @@ public class UI_General_Method {
             if (endPoint!=null)
             {
 
-                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).fit().into(imageView);
+                Picasso.with(imageView.getContext()).load(Uri.parse(Tags.IMAGE_URL_SPONSOR+endPoint)).into(imageView);
             }
         }
 

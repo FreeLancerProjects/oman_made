@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -71,6 +72,9 @@ public class Fragment_Home extends Fragment {
 
     private Timer timer,timer2;
     private TimerTask timerTask,timerTask2;
+
+    private int category_id=0,location_id=0;
+    private String query="";
 
 
 
@@ -141,23 +145,23 @@ public class Fragment_Home extends Fragment {
 
         //////////////////////////
 
-        if (lang.equals("ar"))
-        {
+        if (lang.equals("ar")) {
             selectedLangCode = arLangCode;
 
-            spinnerLocationModelList.add(new SpinnerModel(0,"إختر",arLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "الموقع", arLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "اخرى", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0,"إختر",arLangCode));
+            selectedListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
 
-        }else
-            {
-                selectedLangCode = enLangCode;
+        } else {
+            selectedLangCode = enLangCode;
 
-                spinnerLocationModelList.add(new SpinnerModel(0,"Choose",enLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "Location", enLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "Other", arLangCode));
 
-                selectedListingModelList.add(new SpinnerModel(0,"Choose",arLangCode));
+            selectedListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
 
-            }
+        }
 
         spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList,activity);
         binding.spinnerLocation.setAdapter(spinnerLocationAdapter);
@@ -166,7 +170,59 @@ public class Fragment_Home extends Fragment {
         binding.spinnerCategoryListing.setAdapter(spinnerCategoryListingAdapter);
 
 
+
+        binding.spinnerCategoryListing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if (i == 0) {
+                    category_id = 0;
+                } else {
+                    category_id = selectedListingModelList.get(i).getId();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        binding.spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if (i == 0) {
+                    location_id = 0;
+                }else if (i==1){
+
+                } else {
+                    location_id = spinnerLocationModelList.get(i).getId();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         ///////////////////////////
+
+
+        binding.btnSearch.setOnClickListener(view -> {
+
+            String query = binding.edtQuery.getText().toString().trim();
+            if (query.isEmpty()&&category_id==0&&location_id==0)
+            {
+                activity.DisplayFragmentDirectory(0,query,category_id,location_id);
+            }else
+                {
+                    activity.DisplayFragmentDirectory(1,query,category_id,location_id);
+
+                }
+
+        });
 
         getSlider();
         getSponsor();
@@ -697,13 +753,17 @@ public class Fragment_Home extends Fragment {
 
         for (int i =start; i<spinnerCategoryListingModelList.size();i++)
         {
+            Log.e("dididi",spinnerCategoryListingModelList.get(i).getId()+"_");
             spinnerModelList.add(spinnerCategoryListingModelList.get(i));
         }
 
         return spinnerModelList;
     }
 
+    public void setItemData() {
 
+        activity.DisplayFragmentDirectory(0,"",0,0);
+    }
 
 
     private class MyTimerTask extends TimerTask{
@@ -729,7 +789,7 @@ public class Fragment_Home extends Fragment {
             activity.runOnUiThread(() -> {
 
 
-                if (binding.recViewSponsor.getCurrentItem()<sponsorsList.size()-1)
+                if (binding.recViewSponsor.getCurrentItem()<Integer.MAX_VALUE)
                 {
                     try {
                         int item = binding.recViewSponsor.getCurrentItem()+1;

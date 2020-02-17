@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -49,6 +50,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
+    private static final String TAG1="query";
+    private static final String TAG2="cat_id";
+    private static final String TAG3="loc_id";
+
     private FragmentDirectoryBinding binding;
     private HomeActivity activity;
     private Preferences preferences;
@@ -76,11 +81,19 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private ClusterManager clusterManager;
     private ClusterRender clusterRender;
 
-    private Call<List<BusinessDataModel>> call,callLoadMore,searchWithKeyWordCall,searchWithKeywordLoadMoreCall,searchCall,searchLoadMoreCall;
+    private Call<List<BusinessDataModel>> call,callLoadMore,searchCall,searchLoadMoreCall;
     private Call<MediaModel> callMedia,callLoadMoreMedia;
 
-    public static Fragment_Directory newInstance() {
-        return new Fragment_Directory();
+    public static Fragment_Directory newInstance(String query,int category_id,int location_id) {
+
+        Bundle bundle = new Bundle();
+        bundle.putString(TAG1,query);
+        bundle.putInt(TAG2,category_id);
+        bundle.putInt(TAG3,location_id);
+
+        Fragment_Directory fragment_directory = new Fragment_Directory();
+        fragment_directory.setArguments(bundle);
+        return fragment_directory;
     }
 
 
@@ -121,16 +134,18 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         if (lang.equals("ar")) {
             selectedLangCode = arLangCode;
 
-            spinnerLocationModelList.add(new SpinnerModel(0, "إختر", arLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "الموقع", arLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "اخرى", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "إختر", arLangCode));
+            selectedListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
 
         } else {
             selectedLangCode = enLangCode;
 
-            spinnerLocationModelList.add(new SpinnerModel(0, "Choose", enLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "Location", enLangCode));
+            spinnerLocationModelList.add(new SpinnerModel(0, "Other", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "Choose", arLangCode));
+            selectedListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
 
         }
 
@@ -156,9 +171,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         loadMoreBusiness(page);
 
                     } else if (searchType == 1) {
-                        loadMoreWithKeyword(page,query);
-                    } else {
                         loadMoreSearch(query,page,cat_id,location_id);
+
                     }
 
                 }
@@ -174,7 +188,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 if (i == 0) {
                     cat_id = 0;
                 } else {
-                    cat_id = spinnerCategoryListingModelList.get(i).getId();
+                    cat_id = selectedListingModelList.get(i).getId();
                 }
             }
 
@@ -190,6 +204,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                 if (i == 0) {
                     location_id = 0;
+                }else if (i==1){
+
                 } else {
                     location_id = spinnerLocationModelList.get(i).getId();
                 }
@@ -209,6 +225,25 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             checkSearch(query, cat_id, location_id);
         });
 
+        Bundle bundle = getArguments();
+        if (bundle!=null)
+        {
+            query = bundle.getString(TAG1);
+            cat_id = bundle.getInt(TAG2);
+            location_id = bundle.getInt(TAG3);
+
+        }
+
+        if (query.isEmpty()&&cat_id==0&&location_id==0)
+        {
+            getBusiness();
+
+        }else
+        {
+            search(query,cat_id,location_id);
+        }
+
+
         binding.tvClear.setOnClickListener(view -> {
 
             if (callMedia!=null)
@@ -221,18 +256,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 isLoading = false;
             }
 
-            if (searchWithKeyWordCall!=null)
-            {
-                searchWithKeyWordCall.cancel();
-
-            }
-
-            if (searchWithKeywordLoadMoreCall!=null)
-            {
-                searchWithKeywordLoadMoreCall.cancel();
-                isLoading = false;
-
-            }
 
             if (searchCall!=null)
             {
@@ -253,10 +276,10 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         getLocation();
         getCategoryListing();
         getDirectory();
-        getBusiness();
+
+
 
     }
-
 
     private void getDirectory() {
 
@@ -325,12 +348,36 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
     private void getBusiness() {
+        index = 0;
+
         binding.tvClear.setVisibility(View.GONE);
         businessDataModelList.clear();
         businessAdapter.notifyDataSetChanged();
         binding.progBarSearch.setVisibility(View.VISIBLE);
         binding.tvNoData2.setVisibility(View.GONE);
         searchType =0;
+
+        if (searchCall!=null)
+        {
+            searchCall.cancel();
+        }
+        if (searchLoadMoreCall!=null)
+        {
+            searchLoadMoreCall.cancel();
+        }
+        if (callLoadMore!=null)
+        {
+            callLoadMore.cancel();
+        }
+        if (callMedia!=null)
+        {
+            callMedia.cancel();
+        }
+
+        if (callLoadMoreMedia!=null)
+        {
+            callLoadMoreMedia.cancel();
+        }
 
        call = Api.getService(Tags.base_url1).getBusiness(lang, 1);
 
@@ -406,6 +453,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
 
                 if (response.isSuccessful() && response.body() != null && response.body().getGuid() != null) {
+
 
                     BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
                     model.setImagePath(response.body().getGuid().getRendered());
@@ -515,7 +563,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                         if (inCompleteBusinessDataModelList.size() > 0) {
                             addMarker();
-
                             businessAdapter.notifyItemRangeChanged(oldPos, businessDataModelList.size() - 1);
                             currentPage += 1;
 
@@ -601,6 +648,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
     private void loadMoreBusiness(int page) {
+        index = 0;
 
         callLoadMore =  Api.getService(Tags.base_url1).getBusiness(lang, page);
 
@@ -691,7 +739,11 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                                 spinnerLocationModelList.addAll(response.body());
                                 activity.runOnUiThread(() -> {
                                     spinnerLocationAdapter.notifyDataSetChanged();
+
                                 });
+
+
+
                             }
 
                         } else {
@@ -804,39 +856,70 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             }
 
 
+
+
+
+
         }
     }
 
-    private void checkSearch(String query, int cat_id, int location_id) {
+    private void updateSelectedLocation()
+    {
+
+        if (location_id!=0)
+        {
+            for (int i =0;i<spinnerLocationModelList.size();i++)
+            {
+                if (spinnerLocationModelList.get(i).getId()==location_id)
+                {
+                    binding.spinnerLocation.setSelection(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateSpinnersSelectedData(String query,int category_id,int location_id)
+    {
+        this.query =query;
+        this.cat_id = category_id;
+        this.location_id=location_id;
+        binding.edtKeyword.setText(query);
+
+        if (selectedListingModelList.size()>0)
+        {
+            if (cat_id!=0)
+            {
+                for (int i =0;i<selectedListingModelList.size();i++)
+                {
+
+                    if (selectedListingModelList.get(i).getId()==cat_id)
+                    {
+                        binding.spinnerCategoryListing.setSelection(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        updateSelectedLocation();
+
+
+
+    }
+
+    public void checkSearch(String query, int cat_id, int location_id) {
+
 
         if (cat_id == 0 && location_id == 0) {
             if (query.isEmpty()) {
                 binding.edtKeyword.setError(getString(R.string.field_req));
             } else {
                 binding.edtKeyword.setError(null);
-                searchWithKeyword(query);
-                searchType = 1;
             }
         } else {
-            if (cat_id == 0) {
-                Toast.makeText(activity, "Choose category", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (location_id == 0) {
-                Toast.makeText(activity, "Choose location", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-
-            if (query.isEmpty()) {
-                binding.edtKeyword.setError(getString(R.string.field_req));
-                return;
-            }
 
             binding.edtKeyword.setError(null);
-            searchType = 2;
-
             search(query, cat_id, location_id);
 
 
@@ -845,176 +928,9 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private void searchWithKeyword(String query) {
-
-        if (call!=null)
-        {
-            call.cancel();
-        }
-        if (callLoadMore!=null)
-        {
-            callLoadMore.cancel();
-        }
-
-
-        binding.progBarSearch.setVisibility(View.VISIBLE);
-        binding.setCount(0);
-
-        currentPage = 1;
-        businessDataModelList.clear();
-        businessAdapter.notifyDataSetChanged();
-        binding.tvNoData2.setVisibility(View.GONE);
-
-        searchWithKeyWordCall = Api.getService(Tags.base_url1).searchWithQuery(lang, 1, query);
-
-        searchWithKeyWordCall.enqueue(new Callback<List<BusinessDataModel>>() {
-            @Override
-            public void onResponse(Call<List<BusinessDataModel>> call, Response<List<BusinessDataModel>> response) {
-
-
-                if (response.headers().get("X-WP-Total") != null) {
-                    int count = Integer.parseInt(response.headers().get("X-WP-Total"));
-                    binding.setCount(count);
-                }
-
-
-                if (response.isSuccessful() && response.body() != null) {
-
-                    binding.tvClear.setVisibility(View.VISIBLE);
-
-                    inCompleteBusinessDataModelList.clear();
-                    inCompleteBusinessDataModelList.addAll(response.body());
-
-
-                    if (inCompleteBusinessDataModelList.size() > 0) {
-
-                        binding.tvNoData2.setVisibility(View.GONE);
-
-
-
-                        getImages(inCompleteBusinessDataModelList.get(0).getFeatured_media());
-
-
-
-                    } else {
-                        binding.tvNoData2.setVisibility(View.VISIBLE);
-
-                    }
-
-                } else {
-                    try {
-
-                        Log.e("error", response.code() + "_" + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (response.code() == 500) {
-                        Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
-
-
-                    } else {
-                        Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
-
-
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<BusinessDataModel>> call, Throwable t) {
-                binding.progBarSearch.setVisibility(View.GONE);
-                try {
-                    if (t.getMessage() != null) {
-                        Log.e("error", t.getMessage());
-                        if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
-                            Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                } catch (Exception e) {
-                }
-
-
-            }
-        });
-
-    }
-
-    private void loadMoreWithKeyword(int page, String query) {
-
-        searchWithKeywordLoadMoreCall = Api.getService(Tags.base_url1).searchWithQuery(lang, page, query);
-
-        searchWithKeywordLoadMoreCall.enqueue(new Callback<List<BusinessDataModel>>() {
-            @Override
-            public void onResponse(Call<List<BusinessDataModel>> call, Response<List<BusinessDataModel>> response) {
-
-                if (response.isSuccessful() && response.body() != null) {
-
-                    inCompleteBusinessDataModelList.clear();
-                    inCompleteBusinessDataModelList.addAll(response.body());
-
-                    if(inCompleteBusinessDataModelList.size()>0)
-                    {
-                        getImagesLoadMore(inCompleteBusinessDataModelList.get(0).getFeatured_media());
-
-                    }
-
-
-
-                }else if (response.code()==400){} else {
-                    try {
-                        businessDataModelList.remove(businessDataModelList.size() - 1);
-                        businessAdapter.notifyItemRemoved(businessDataModelList.size() - 1);
-                        isLoading = false;
-                        Log.e("error", response.code() + "_" + response.errorBody().string());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (response.code() == 500) {
-                        Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
-
-
-                    } else {
-                        Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
-
-
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<BusinessDataModel>> call, Throwable t) {
-
-                if (businessDataModelList.get(businessDataModelList.size() - 1) == null) {
-                    businessDataModelList.remove(businessDataModelList.size() - 1);
-                    businessAdapter.notifyItemRemoved(businessDataModelList.size() - 1);
-                    isLoading = false;
-                }
-
-                try {
-                    if (t.getMessage() != null) {
-                        Log.e("error", t.getMessage());
-                        if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
-                            Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                } catch (Exception e) {
-                }
-
-
-            }
-        });
-    }
-
-
     private void search(String query, int cat_id, int location_id) {
+        searchType = 1;
+        index = 0;
         if (call!=null)
         {
             call.cancel();
@@ -1022,6 +938,15 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         if (callLoadMore!=null)
         {
             callLoadMore.cancel();
+        }
+        if (callMedia!=null)
+        {
+            callMedia.cancel();
+        }
+
+        if (callLoadMoreMedia!=null)
+        {
+            callLoadMoreMedia.cancel();
         }
 
         binding.progBarSearch.setVisibility(View.VISIBLE);
@@ -1032,11 +957,36 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         binding.tvNoData2.setVisibility(View.GONE);
 
 
-        searchCall = Api.getService(Tags.base_url1).search(lang, 1, cat_id, location_id, query);
+        String q =null;
+        String loc_id=null;
+        String category_id=null;
+
+        if (!query.isEmpty())
+        {
+            q = query;
+
+        }
+
+        if (location_id!=0)
+        {
+            loc_id = String.valueOf(location_id);
+
+        }
+
+        if (cat_id!=0)
+        {
+            category_id = String.valueOf(cat_id);
+
+        }
+
+
+
+        searchCall = Api.getService(Tags.base_url1).search(lang, 1,category_id,loc_id,q);
         searchCall.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
             public void onResponse(Call<List<BusinessDataModel>> call, Response<List<BusinessDataModel>> response) {
 
+                updateSpinnersSelectedData(query, cat_id, location_id);
                 if (response.headers().get("X-WP-Total") != null) {
                     int count = Integer.parseInt(response.headers().get("X-WP-Total"));
                     binding.setCount(count);
@@ -1056,6 +1006,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
 
                     } else {
+                        binding.progBarSearch.setVisibility(View.GONE);
+
                         binding.tvNoData2.setVisibility(View.VISIBLE);
 
                     }
@@ -1103,8 +1055,32 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
     private void loadMoreSearch(String query, int page, int cat_id, int location_id) {
+        index = 0;
 
-        searchLoadMoreCall = Api.getService(Tags.base_url1).search(lang, page, cat_id, location_id, query);
+        String q =null;
+        String loc_id=null;
+        String category_id=null;
+
+        if (!query.isEmpty())
+        {
+            q = query;
+
+        }
+
+        if (location_id!=0)
+        {
+            loc_id = String.valueOf(location_id);
+
+        }
+
+        if (cat_id!=0)
+        {
+            category_id = String.valueOf(cat_id);
+
+        }
+
+
+        searchLoadMoreCall = Api.getService(Tags.base_url1).search(lang, page, category_id, loc_id, q);
 
         searchLoadMoreCall.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
@@ -1113,7 +1089,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                 if (response.isSuccessful() && response.body() != null) {
 
-                    inCompleteBusinessDataModelList.clear();
                     inCompleteBusinessDataModelList.addAll(response.body());
 
                     if(inCompleteBusinessDataModelList.size()>0)
@@ -1193,10 +1168,15 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
         for (int i = start; i < spinnerCategoryListingModelList.size(); i++) {
             spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+            Log.e("idddddd",spinnerCategoryListingModelList.get(i).getId()+"__");
         }
 
         return spinnerModelList;
     }
+
+
+
+
 
     private void initMap() {
 
@@ -1220,7 +1200,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setCompassEnabled(false);
             mMap.getUiSettings().setTiltGesturesEnabled(false);
-
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31.958090,35.945808),10.0f));
 
             clusterManager = new ClusterManager(activity,mMap);
             mMap.setOnCameraIdleListener(clusterManager);

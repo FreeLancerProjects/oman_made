@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">عمان ميد</string>
+    <string name="app_name">صنع في عمان</string>
     <string name="map_api_key">AIzaSyCbc2Y5AIwZ8uUeHRUXiozGN3CnpjKT0oI</string>
 
     <string name="navigation_drawer_open">فتح</string>
@@ -43,8 +43,8 @@
     <string name="send">إرسال</string>
     <string name="ok">حسنا!</string>
     <string name="directory">الدليل</string>
-    <string name="indus_Area">المنطقة الصناعية</string>
-    <string name="spons">كفيل</string>
+    <string name="indus_Area">المناطق الصناعية</string>
+    <string name="spons">الرعاة</string>
     <string name="no_data_to_show">لاتوجد عناصر لعرضها</string>
     <string name="create_new_listing">إنشاء مؤسسة</string>
     <string name="profile">حسابي</string>

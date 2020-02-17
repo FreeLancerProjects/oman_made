@@ -225,6 +225,10 @@ public class HomeActivity extends AppCompatActivity {
 
         cardViewMainHome.setOnClickListener(view -> {
 
+
+            expandLayoutSupport.collapse(true);
+            expandLayoutLegal.collapse(true);
+            expandLayoutAbout.collapse(true);
             if (expandLayoutHome.isExpanded()) {
                 expandLayoutHome.collapse(true);
                 arrow1.animate().rotationBy(-180).setDuration(500).start();
@@ -236,6 +240,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         cardViewMainAbout.setOnClickListener(view -> {
+
+            expandLayoutSupport.collapse(true);
+            expandLayoutLegal.collapse(true);
+            expandLayoutHome.collapse(true);
 
             if (expandLayoutAbout.isExpanded()) {
                 expandLayoutAbout.collapse(true);
@@ -249,6 +257,10 @@ public class HomeActivity extends AppCompatActivity {
 
         cardViewMainSupport.setOnClickListener(view -> {
 
+            expandLayoutAbout.collapse(true);
+            expandLayoutLegal.collapse(true);
+            expandLayoutHome.collapse(true);
+
             if (expandLayoutSupport.isExpanded()) {
                 expandLayoutSupport.collapse(true);
                 arrow3.animate().rotationBy(-180).setDuration(500).start();
@@ -260,6 +272,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         cardViewMainLegal.setOnClickListener(view -> {
+
+            expandLayoutAbout.collapse(true);
+            expandLayoutSupport.collapse(true);
+            expandLayoutHome.collapse(true);
 
             if (expandLayoutLegal.isExpanded()) {
                 expandLayoutLegal.collapse(true);
@@ -303,7 +319,7 @@ public class HomeActivity extends AppCompatActivity {
             new Handler()
                     .postDelayed(() -> {
                         drawer.closeDrawer(GravityCompat.START);
-                        DisplayFragmentDirectory();
+                        DisplayFragmentDirectory(0,"",0,0);
                     }, 500);
 
 
@@ -597,7 +613,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    private void setUpBottomNavigation() {
+    private void setUpBottomNavigation()
+    {
 
         AHBottomNavigationItem item1 = new AHBottomNavigationItem(getString(R.string.home), R.drawable.ic_home);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem(getString(R.string.directory), R.drawable.ic_search);
@@ -621,7 +638,7 @@ public class HomeActivity extends AppCompatActivity {
                     DisplayFragmentHome();
                     break;
                 case 1:
-                    DisplayFragmentDirectory();
+                    DisplayFragmentDirectory(0,"",0,0);
                     break;
                 case 2:
                     DisplayFragmentIndustrialArea();
@@ -639,8 +656,6 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
-
-
     private void DisplayFragmentHome() {
         if (fragment_home == null) {
             fragment_home = Fragment_Home.newInstance();
@@ -667,14 +682,13 @@ public class HomeActivity extends AppCompatActivity {
 
         }
         ah_bottom_nav.setCurrentItem(0, false);
-        tvTitle.setText(getString(R.string.home));
 
     }
 
-    private void DisplayFragmentDirectory() {
+    public void DisplayFragmentDirectory(int type,String query,int category_id,int location_id) {
 
         if (fragment_directory == null) {
-            fragment_directory = Fragment_Directory.newInstance();
+            fragment_directory = Fragment_Directory.newInstance(query, category_id, location_id);
         }
 
         if (fragment_home != null && fragment_home.isAdded()) {
@@ -692,13 +706,17 @@ public class HomeActivity extends AppCompatActivity {
 
         if (fragment_directory.isAdded()) {
             fragmentManager.beginTransaction().show(fragment_directory).commit();
+            if (type==1)
+            {
+                fragment_directory.updateSpinnersSelectedData(query,category_id,location_id);
+                fragment_directory.checkSearch(query,category_id,location_id);
+            }
 
         } else {
             fragmentManager.beginTransaction().add(R.id.fragment_home_container, fragment_directory, "fragment_directory").addToBackStack("fragment_directory").commit();
 
         }
         ah_bottom_nav.setCurrentItem(1, false);
-        tvTitle.setText(getString(R.string.directory));
 
 
     }
@@ -732,7 +750,6 @@ public class HomeActivity extends AppCompatActivity {
         }
         ah_bottom_nav.setCurrentItem(2, false);
 
-        tvTitle.setText(getString(R.string.indus_Area));
 
     }
 
@@ -764,7 +781,6 @@ public class HomeActivity extends AppCompatActivity {
         }
         ah_bottom_nav.setCurrentItem(3, false);
 
-        tvTitle.setText(getString(R.string.spons));
 
     }
 

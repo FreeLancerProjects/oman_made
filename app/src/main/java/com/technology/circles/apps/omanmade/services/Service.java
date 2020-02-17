@@ -106,8 +106,8 @@ public interface Service {
     @GET("wp-json/wp/v2/business")
     Call<List<BusinessDataModel>> search(@Query("lang") String lang,
                                          @Query("page") int page,
-                                         @Query("listing_categories") int listing_categories,
-                                         @Query("locations") int locations,
+                                         @Query("listing_categories") String listing_categories,
+                                         @Query("locations") String locations,
                                          @Query("search") String search
 
     );
