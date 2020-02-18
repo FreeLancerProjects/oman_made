@@ -6,10 +6,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -29,6 +29,7 @@ import com.technology.circles.apps.omanmade.activities_fragments.activity_home.H
 import com.technology.circles.apps.omanmade.adapter.BusinessAdapter;
 import com.technology.circles.apps.omanmade.adapter.DirectoryAdapter;
 import com.technology.circles.apps.omanmade.adapter.SpinnerLocationAdapter;
+import com.technology.circles.apps.omanmade.databinding.DialogSpinnerBinding;
 import com.technology.circles.apps.omanmade.databinding.FragmentDirectoryBinding;
 import com.technology.circles.apps.omanmade.models.BusinessDataModel;
 import com.technology.circles.apps.omanmade.models.ClusterLocation;
@@ -53,6 +54,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private static final String TAG1="query";
     private static final String TAG2="cat_id";
     private static final String TAG3="loc_id";
+    private static final String TAG4="cat_name";
+    private static final String TAG5="loc_name";
 
     private FragmentDirectoryBinding binding;
     private HomeActivity activity;
@@ -60,9 +63,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private String lang;
     private SupportMapFragment fragment;
     private GoogleMap mMap;
-    private List<SpinnerModel> spinnerLocationModelList, spinnerCategoryListingModelList;
-    private List<SpinnerModel> selectedListingModelList;
-    private SpinnerLocationAdapter spinnerLocationAdapter, spinnerCategoryListingAdapter;
+
     private final int arLangCode = 732, enLangCode = 730;
     private int selectedLangCode = arLangCode;
     private List<DirectoryDataModel.DirectoryModel> directoryModelList;
@@ -84,12 +85,24 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private Call<List<BusinessDataModel>> call,callLoadMore,searchCall,searchLoadMoreCall;
     private Call<MediaModel> callMedia,callLoadMoreMedia;
 
-    public static Fragment_Directory newInstance(String query,int category_id,int location_id) {
+    private AlertDialog categoryDialog, locationDialog;
+
+    private DialogSpinnerBinding dialogSpinnerCategoryBinding,dialogSpinnerLocationBinding;
+    private int currentPageCategory = 1;
+    private boolean isLoadingCategory = false;
+    private int totalPageCategory = 1;
+    private List<SpinnerModel> spinnerLocationModelList, spinnerCategoryListingModelList;
+    private SpinnerLocationAdapter spinnerLocationAdapter, spinnerCategoryAdapter;
+
+    private String cat_name="",loc_name="";
+    public static Fragment_Directory newInstance(String query,int category_id,int location_id,String category_name,String location_name) {
 
         Bundle bundle = new Bundle();
         bundle.putString(TAG1,query);
         bundle.putInt(TAG2,category_id);
         bundle.putInt(TAG3,location_id);
+        bundle.putString(TAG4,category_name);
+        bundle.putString(TAG5,location_name);
 
         Fragment_Directory fragment_directory = new Fragment_Directory();
         fragment_directory.setArguments(bundle);
@@ -111,7 +124,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         businessDataModelList = new ArrayList<>();
         directoryModelList = new ArrayList<>();
         spinnerCategoryListingModelList = new ArrayList<>();
-        selectedListingModelList = new ArrayList<>();
         spinnerLocationModelList = new ArrayList<>();
 
         activity = (HomeActivity) getActivity();
@@ -137,7 +149,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             spinnerLocationModelList.add(new SpinnerModel(0, "الموقع", arLangCode));
             spinnerLocationModelList.add(new SpinnerModel(0, "اخرى", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
+            spinnerCategoryListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
 
         } else {
             selectedLangCode = enLangCode;
@@ -145,15 +157,16 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             spinnerLocationModelList.add(new SpinnerModel(0, "Location", enLangCode));
             spinnerLocationModelList.add(new SpinnerModel(0, "Other", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
+            spinnerCategoryListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
 
         }
 
-        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList, activity);
-        binding.spinnerLocation.setAdapter(spinnerLocationAdapter);
 
-        spinnerCategoryListingAdapter = new SpinnerLocationAdapter(selectedListingModelList, activity);
-        binding.spinnerCategoryListing.setAdapter(spinnerCategoryListingAdapter);
+        binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
+
+        binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
+
+
 
         binding.recViewSearch.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -181,41 +194,15 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
         ////////////////////////////////////////////////////
 
-        binding.spinnerCategoryListing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if (i == 0) {
-                    cat_id = 0;
-                } else {
-                    cat_id = selectedListingModelList.get(i).getId();
-                }
-            }
+        binding.spinnerCategory.setOnClickListener(view -> categoryDialog.show());
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
+        binding.spinnerLocation.setOnClickListener(view -> locationDialog.show());
 
-            }
-        });
-
-        binding.spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                if (i == 0) {
-                    location_id = 0;
-                }else if (i==1){
-
-                } else {
-                    location_id = spinnerLocationModelList.get(i).getId();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        spinnerCategoryAdapter = new SpinnerLocationAdapter(spinnerCategoryListingModelList, activity, this,1);
+        createCategoryDialog();
+        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList, activity, this,2);
+        createLocationDialog();
 
         ////////////////////////////////////////////////////
         binding.btnSearch.setOnClickListener(view -> {
@@ -231,6 +218,27 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             query = bundle.getString(TAG1);
             cat_id = bundle.getInt(TAG2);
             location_id = bundle.getInt(TAG3);
+
+            cat_name = bundle.getString(TAG4);
+            loc_name = bundle.getString(TAG5);
+
+        }
+
+        if (cat_name.isEmpty())
+        {
+            binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
+        }else
+            {
+                binding.tvSpinnerCategory.setText(cat_name);
+
+            }
+
+        if (loc_name.isEmpty())
+        {
+            binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
+        }else
+        {
+            binding.tvSpinnerLocation.setText(loc_name);
 
         }
 
@@ -732,15 +740,13 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+                        dialogSpinnerLocationBinding.progBar.setVisibility(View.GONE);
 
                         if (response.isSuccessful() && response.body() != null) {
 
                             if (response.body().size() > 0) {
                                 spinnerLocationModelList.addAll(response.body());
-                                activity.runOnUiThread(() -> {
-                                    spinnerLocationAdapter.notifyDataSetChanged();
 
-                                });
 
 
 
@@ -768,6 +774,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                     @Override
                     public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
+                        dialogSpinnerLocationBinding.progBar.setVisibility(View.GONE);
+
                         try {
                             if (t.getMessage() != null) {
                                 Log.e("error", t.getMessage());
@@ -790,16 +798,27 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private void getCategoryListing() {
 
         Api.getService(Tags.base_url1).
-                getListingCategory().
+                getListingCategory(1).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+                        dialogSpinnerCategoryBinding.progBar.setVisibility(View.GONE);
+                        totalPageCategory = Integer.parseInt(response.headers().get("X-WP-TotalPages"));
 
+                        if (totalPageCategory>1)
+                        {
+                            dialogSpinnerCategoryBinding.cardMore.setVisibility(View.VISIBLE);
+                        }else
+                        {
+                            dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
+
+                        }
                         if (response.isSuccessful() && response.body() != null) {
 
                             if (response.body().size() > 0) {
-                                spinnerCategoryListingModelList.addAll(response.body());
-                                updateSpinnerCategoryListing(spinnerCategoryListingModelList);
+                                updateSpinnerCategoryListing(response.body(), 1);
+                            } else {
+                                dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
 
                         } else {
@@ -843,41 +862,110 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void updateSpinnerCategoryListing(List<SpinnerModel> spinnerCategoryListingModelList) {
+    private void loadMoreCategoryListing(int page) {
+        Api.getService(Tags.base_url1).
+                getListingCategory(page).
+                enqueue(new Callback<List<SpinnerModel>>() {
+                    @Override
+                    public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
 
 
-        if (spinnerCategoryListingModelList.size() > 0) {
+                            if (response.body().size() > 0) {
+                                currentPageCategory = page;
+                                updateSpinnerCategoryListing(response.body(), 2);
+                            } else {
+                                dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
+                            }
+
+                        } else {
+
+                            spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                            spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                            isLoadingCategory = false;
+
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
+                        try {
+                            spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                            spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                            isLoadingCategory = false;
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+                    }
+                });
+    }
+
+    private void updateSpinnerCategoryListing(List<SpinnerModel> list, int type) {
+
+        if (list.size() > 0) {
+            int old_pos = list.size() - 1;
             if (lang.equals("ar")) {
-                selectedListingModelList.addAll(getArCategoryListing());
-                spinnerCategoryListingAdapter.notifyDataSetChanged();
-            } else {
-                selectedListingModelList.addAll(getEnCategoryListing());
-                spinnerCategoryListingAdapter.notifyDataSetChanged();
-            }
-
-
-
-
-
-
-        }
-    }
-
-    private void updateSelectedLocation()
-    {
-
-        if (location_id!=0)
-        {
-            for (int i =0;i<spinnerLocationModelList.size();i++)
-            {
-                if (spinnerLocationModelList.get(i).getId()==location_id)
+                if (type ==2)
                 {
-                    binding.spinnerLocation.setSelection(i);
-                    break;
+                    this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
+                    spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
+                    isLoadingCategory = false;
                 }
+                this.spinnerCategoryListingModelList.addAll(getArCategoryListing(list));
+                dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+            } else {
+
+                if (type ==2)
+                {
+                    this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
+                    spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
+                    isLoadingCategory = false;
+                }
+                this.spinnerCategoryListingModelList.addAll(getEnCategoryListing(list));
             }
+
+            if (type == 1)// is normal data
+            {
+                spinnerCategoryAdapter.notifyDataSetChanged();
+
+            } else // is load more
+            {
+
+
+                spinnerCategoryAdapter.notifyItemRangeChanged(old_pos, this.spinnerCategoryListingModelList.size());
+            }
+
+
         }
     }
+
 
     public void updateSpinnersSelectedData(String query,int category_id,int location_id)
     {
@@ -886,23 +974,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         this.location_id=location_id;
         binding.edtKeyword.setText(query);
 
-        if (selectedListingModelList.size()>0)
-        {
-            if (cat_id!=0)
-            {
-                for (int i =0;i<selectedListingModelList.size();i++)
-                {
 
-                    if (selectedListingModelList.get(i).getId()==cat_id)
-                    {
-                        binding.spinnerCategoryListing.setSelection(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-        updateSelectedLocation();
 
 
 
@@ -1150,25 +1222,24 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private List<SpinnerModel> getArCategoryListing() {
+    private List<SpinnerModel> getArCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
-        int end = spinnerCategoryListingModelList.size() / 2;
 
-        for (int i = 0; i < end; i++) {
-            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+        for (int i = 0; i < (list.size() / 2); i++) {
+            spinnerModelList.add(list.get(i));
+
         }
 
         return spinnerModelList;
     }
 
 
-    private List<SpinnerModel> getEnCategoryListing() {
+    private List<SpinnerModel> getEnCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
-        int start = spinnerCategoryListingModelList.size() / 2;
 
-        for (int i = start; i < spinnerCategoryListingModelList.size(); i++) {
-            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
-            Log.e("idddddd",spinnerCategoryListingModelList.get(i).getId()+"__");
+        for (int i = ((list.size() / 2) + 1); i < list.size(); i++) {
+            spinnerModelList.add(list.get(i));
+
         }
 
         return spinnerModelList;
@@ -1268,4 +1339,95 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
+    private void createCategoryDialog()
+    {
+
+        categoryDialog = new AlertDialog.Builder(activity)
+                .create();
+        LinearLayoutManager manager = new LinearLayoutManager(activity);
+        dialogSpinnerCategoryBinding = DataBindingUtil.inflate(LayoutInflater.from(activity), R.layout.dialog_spinner, null, false);
+        dialogSpinnerCategoryBinding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        dialogSpinnerCategoryBinding.recView.setLayoutManager(manager);
+        dialogSpinnerCategoryBinding.recView.setAdapter(spinnerCategoryAdapter);
+
+        dialogSpinnerCategoryBinding.btnLoadMore.setOnClickListener(view ->
+        {
+            if (!isLoadingCategory) {
+
+                int page = currentPageCategory + 1;
+                if (page <= totalPageCategory) {
+                    spinnerCategoryListingModelList.add(null);
+                    spinnerCategoryAdapter.notifyItemInserted(spinnerCategoryListingModelList.size() - 1);
+                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+
+                    loadMoreCategoryListing(page);
+                }else
+                {
+                    dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+
+
+        dialogSpinnerCategoryBinding.btnCancel.setOnClickListener(v -> categoryDialog.dismiss()
+
+        );
+        categoryDialog.getWindow().getAttributes().windowAnimations = R.style.dialog_congratulation_animation;
+        categoryDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_window_bg);
+        categoryDialog.setCanceledOnTouchOutside(false);
+        categoryDialog.setView(dialogSpinnerCategoryBinding.getRoot());
+
+    }
+
+    private void createLocationDialog()
+    {
+
+        locationDialog = new AlertDialog.Builder(activity)
+                .create();
+        LinearLayoutManager manager = new LinearLayoutManager(activity);
+        dialogSpinnerLocationBinding = DataBindingUtil.inflate(LayoutInflater.from(activity), R.layout.dialog_spinner, null, false);
+        dialogSpinnerLocationBinding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        dialogSpinnerLocationBinding.recView.setLayoutManager(manager);
+        dialogSpinnerLocationBinding.recView.setAdapter(spinnerLocationAdapter);
+
+        dialogSpinnerLocationBinding.btnLoadMore.setVisibility(View.GONE);
+
+
+        dialogSpinnerLocationBinding.btnCancel.setOnClickListener(v -> locationDialog.dismiss()
+
+        );
+        locationDialog.getWindow().getAttributes().windowAnimations = R.style.dialog_congratulation_animation;
+        locationDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_window_bg);
+        locationDialog.setCanceledOnTouchOutside(false);
+        locationDialog.setView(dialogSpinnerLocationBinding.getRoot());
+
+    }
+
+
+    public void setCategoryData(SpinnerModel spinnerModel) {
+        this.cat_id = spinnerModel.getId();
+        binding.tvSpinnerCategory.setText(spinnerModel.getName());
+        categoryDialog.dismiss();
+
+    }
+
+    public void setLocationData(SpinnerModel spinnerModel, int adapterPosition) {
+
+        if (adapterPosition!=0)
+        {
+            if (adapterPosition==1)
+            {
+                locationDialog.dismiss();
+
+            }else
+                {
+                    location_id = spinnerModel.getId();
+                    binding.tvSpinnerLocation.setText(spinnerModel.getName());
+                    locationDialog.dismiss();
+                }
+
+        }
+    }
 }

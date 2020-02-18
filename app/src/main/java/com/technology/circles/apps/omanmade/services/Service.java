@@ -84,7 +84,7 @@ public interface Service {
     Call<List<SpinnerModel>> getLocation(@Query("parent") int lang);
 
     @GET("wp-json/wp/v2/listing_categories")
-    Call<List<SpinnerModel>> getListingCategory();
+    Call<List<SpinnerModel>> getListingCategory(@Query("page")int page);
 
 
     @GET("api/dir-ads")

@@ -47,8 +47,7 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         MyHolder myHolder = (MyHolder) holder;
 
-        int pos = position % list.size();
-        myHolder.binding.setModel(list.get(pos));
+        myHolder.binding.setModel(list.get(position));
 
 
 
@@ -56,7 +55,7 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return Integer.MAX_VALUE/8;
+        return list.size();
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
@@ -68,6 +67,8 @@ public class SponsorAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         }
     }
+
+
 
 
 }

@@ -6,16 +6,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.leochuan.CenterSnapHelper;
+import com.leochuan.ScaleLayoutManager;
+import com.leochuan.ScrollHelper;
+import com.leochuan.ViewPagerLayoutManager;
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.HomeActivity;
 import com.technology.circles.apps.omanmade.adapter.FeatureListingAdapter;
@@ -24,18 +26,17 @@ import com.technology.circles.apps.omanmade.adapter.IndustrialAreaAdapter;
 import com.technology.circles.apps.omanmade.adapter.SliderAdapter;
 import com.technology.circles.apps.omanmade.adapter.SpinnerLocationAdapter;
 import com.technology.circles.apps.omanmade.adapter.SponsorAdapter;
+import com.technology.circles.apps.omanmade.databinding.DialogSpinnerBinding;
 import com.technology.circles.apps.omanmade.databinding.FragmentHomeBinding;
 import com.technology.circles.apps.omanmade.models.FeatureListingDataModel;
 import com.technology.circles.apps.omanmade.models.FeaturedCategoryDataModel;
 import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
-import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.models.SliderModel;
+import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.models.SponsorsModel;
 import com.technology.circles.apps.omanmade.preferences.Preferences;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.tags.Tags;
-import com.yarolegovich.discretescrollview.transform.Pivot;
-import com.yarolegovich.discretescrollview.transform.ScaleTransformer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,21 +63,23 @@ public class Fragment_Home extends Fragment {
     private IndustrialAreaAdapter industrialAreaAdapter;
     private List<FeaturedCategoryDataModel.FeaturedCategoryModel> featuredCategoryModelList;
     private FeaturedCategoryAdapter featuredCategoryAdapter;
-    private List<SpinnerModel> spinnerLocationModelList,spinnerCategoryListingModelList;
-
-    private List<SpinnerModel> selectedListingModelList;
-
-    private SpinnerLocationAdapter spinnerLocationAdapter,spinnerCategoryListingAdapter;
-    private final int arLangCode = 732,enLangCode=730;
+    private List<SpinnerModel> spinnerLocationModelList, spinnerCategoryListingModelList;
+    private SpinnerLocationAdapter spinnerLocationAdapter, spinnerCategoryAdapter;
+    private final int arLangCode = 732, enLangCode = 730;
     private int selectedLangCode = arLangCode;
 
-    private Timer timer,timer2;
-    private TimerTask timerTask,timerTask2;
+    private Timer timer, timer2;
+    private TimerTask timerTask, timerTask2;
 
-    private int category_id=0,location_id=0;
-    private String query="";
-
-
+    private int category_id = 0, location_id = 0;
+    private String query = "";
+    private ViewPagerLayoutManager layoutManager;
+    private AlertDialog categoryDialog, locationDialog;
+    private DialogSpinnerBinding dialogSpinnerCategoryBinding,dialogSpinnerLocationBinding;
+    private int currentPageCategory = 1;
+    private boolean isLoadingCategory = false;
+    private int totalPageCategory = 1;
+    private String cat_name="",loc_name="";
 
 
     public static Fragment_Home newInstance() {
@@ -87,7 +90,7 @@ public class Fragment_Home extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home,container,false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         initView();
 
         return binding.getRoot();
@@ -96,7 +99,6 @@ public class Fragment_Home extends Fragment {
     private void initView() {
 
         spinnerCategoryListingModelList = new ArrayList<>();
-        selectedListingModelList = new ArrayList<>();
         spinnerLocationModelList = new ArrayList<>();
         sponsorsList = new ArrayList<>();
         featureModelList = new ArrayList<>();
@@ -106,40 +108,31 @@ public class Fragment_Home extends Fragment {
         activity = (HomeActivity) getActivity();
         preferences = Preferences.newInstance();
         Paper.init(activity);
-        lang = Paper.book().read("lang","ar");
+        lang = Paper.book().read("lang", "ar");
         binding.progBarSlider.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.progBarSponsor.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.progBarFeature.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         binding.progBarIndustrialArea.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
 
-        binding.recViewFeature.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
+        binding.recViewFeature.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
 
-        binding.recViewSponsor.setItemTransformer(new ScaleTransformer.Builder()
-                .setMaxScale(1.00f)
-                .setMinScale(0.8f)
-                .setPivotX(Pivot.X.CENTER) // CENTER is a default one
-                .setPivotY(Pivot.Y.BOTTOM) // CENTER is a default one
-                .build());
+        layoutManager = new ScaleLayoutManager(activity, 20);
 
-        binding.recViewSponsor.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-            }
-        });
+        layoutManager.setInfinite(true);
+        layoutManager.setMaxVisibleItemCount(3);
+        new CenterSnapHelper().attachToRecyclerView(binding.recViewSponsor);
 
 
-        featureListingAdapter = new FeatureListingAdapter(featureModelList,activity,this);
+        featureListingAdapter = new FeatureListingAdapter(featureModelList, activity, this);
         binding.recViewFeature.setAdapter(featureListingAdapter);
 
 
-        binding.recViewIndustrialArea.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
-        industrialAreaAdapter = new IndustrialAreaAdapter(industrialAreaModelList,activity,this);
+        binding.recViewIndustrialArea.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
+        industrialAreaAdapter = new IndustrialAreaAdapter(industrialAreaModelList, activity, this);
         binding.recViewIndustrialArea.setAdapter(industrialAreaAdapter);
 
-        binding.recViewCategory.setLayoutManager(new LinearLayoutManager(activity,LinearLayoutManager.HORIZONTAL,false));
-        featuredCategoryAdapter = new FeaturedCategoryAdapter(featuredCategoryModelList,activity,this);
+        binding.recViewCategory.setLayoutManager(new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false));
+        featuredCategoryAdapter = new FeaturedCategoryAdapter(featuredCategoryModelList, activity, this);
         binding.recViewCategory.setAdapter(featuredCategoryAdapter);
 
 
@@ -151,7 +144,7 @@ public class Fragment_Home extends Fragment {
             spinnerLocationModelList.add(new SpinnerModel(0, "الموقع", arLangCode));
             spinnerLocationModelList.add(new SpinnerModel(0, "اخرى", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
+            spinnerCategoryListingModelList.add(new SpinnerModel(0, "التصنيف", arLangCode));
 
         } else {
             selectedLangCode = enLangCode;
@@ -159,53 +152,14 @@ public class Fragment_Home extends Fragment {
             spinnerLocationModelList.add(new SpinnerModel(0, "Location", enLangCode));
             spinnerLocationModelList.add(new SpinnerModel(0, "Other", arLangCode));
 
-            selectedListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
+            spinnerCategoryListingModelList.add(new SpinnerModel(0, "Category", arLangCode));
 
         }
 
-        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList,activity);
-        binding.spinnerLocation.setAdapter(spinnerLocationAdapter);
+        binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
 
-        spinnerCategoryListingAdapter = new SpinnerLocationAdapter(selectedListingModelList,activity);
-        binding.spinnerCategoryListing.setAdapter(spinnerCategoryListingAdapter);
+        binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
 
-
-
-        binding.spinnerCategoryListing.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                if (i == 0) {
-                    category_id = 0;
-                } else {
-                    category_id = selectedListingModelList.get(i).getId();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        binding.spinnerLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                if (i == 0) {
-                    location_id = 0;
-                }else if (i==1){
-
-                } else {
-                    location_id = spinnerLocationModelList.get(i).getId();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
 
         ///////////////////////////
 
@@ -213,16 +167,22 @@ public class Fragment_Home extends Fragment {
         binding.btnSearch.setOnClickListener(view -> {
 
             String query = binding.edtQuery.getText().toString().trim();
-            if (query.isEmpty()&&category_id==0&&location_id==0)
-            {
-                activity.DisplayFragmentDirectory(0,query,category_id,location_id);
-            }else
-                {
-                    activity.DisplayFragmentDirectory(1,query,category_id,location_id);
+            if (query.isEmpty() && category_id == 0 && location_id == 0) {
+                activity.DisplayFragmentDirectory(0, query, category_id, location_id,cat_name,loc_name);
+            } else {
+                activity.DisplayFragmentDirectory(1, query, category_id, location_id,cat_name,loc_name);
 
-                }
+            }
 
         });
+        binding.spinnerCategory.setOnClickListener(view -> categoryDialog.show());
+
+        binding.spinnerLocation.setOnClickListener(view -> locationDialog.show());
+
+        spinnerCategoryAdapter = new SpinnerLocationAdapter(spinnerCategoryListingModelList, activity, this,1);
+        createCategoryDialog();
+        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList, activity, this,2);
+        createLocationDialog();
 
         getSlider();
         getSponsor();
@@ -231,7 +191,6 @@ public class Fragment_Home extends Fragment {
         getFeaturedCategory();
         getLocation();
         getCategoryListing();
-
 
 
     }
@@ -247,7 +206,7 @@ public class Fragment_Home extends Fragment {
 
                         if (response.isSuccessful() && response.body() != null) {
 
-                          updateSliderUI(response.body());
+                            updateSliderUI(response.body());
 
                         } else {
                             try {
@@ -286,7 +245,6 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
@@ -294,27 +252,24 @@ public class Fragment_Home extends Fragment {
 
     private void updateSliderUI(SliderModel sliderModel) {
 
-        if (sliderModel.getSlides().size()>0)
-        {
+        if (sliderModel.getSlides().size() > 0) {
             binding.flSliderContainer.setVisibility(View.VISIBLE);
-            sliderAdapter = new SliderAdapter(sliderModel.getSlides(),activity);
+            sliderAdapter = new SliderAdapter(sliderModel.getSlides(), activity);
             binding.pager.setAdapter(sliderAdapter);
             binding.tab.setupWithViewPager(binding.pager);
 
-            if (sliderModel.getSlides().size()>1)
-            {
+            if (sliderModel.getSlides().size() > 1) {
                 timer = new Timer();
                 timerTask = new MyTimerTask();
-                timer.scheduleAtFixedRate(timerTask,6000,6000);
+                timer.scheduleAtFixedRate(timerTask, 6000, 6000);
 
 
             }
 
 
-        }else
-            {
-                binding.flSliderContainer.setVisibility(View.GONE);
-            }
+        } else {
+            binding.flSliderContainer.setVisibility(View.GONE);
+        }
     }
 
     private void getFeature() {
@@ -330,12 +285,10 @@ public class Fragment_Home extends Fragment {
 
                             featureModelList.clear();
                             featureModelList.addAll(response.body().getFeatured_lists());
-                            if (featureModelList.size()>0)
-                            {
+                            if (featureModelList.size() > 0) {
                                 featureListingAdapter.notifyDataSetChanged();
                                 binding.tvNoData2.setVisibility(View.GONE);
-                            }else
-                            {
+                            } else {
                                 binding.tvNoData2.setVisibility(View.VISIBLE);
 
                             }
@@ -377,7 +330,6 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
@@ -398,27 +350,21 @@ public class Fragment_Home extends Fragment {
                             sponsorsList.addAll(response.body().getSponsors());
 
 
-                            if (sponsorsList.size()>0)
-                            {
+                            if (sponsorsList.size() > 0) {
+                                binding.tvNoData1.setVisibility(View.GONE);
 
-                                sponsorAdapter = new SponsorAdapter(sponsorsList,activity,Fragment_Home.this);
+                                sponsorAdapter = new SponsorAdapter(sponsorsList, activity, Fragment_Home.this);
+
+                                binding.recViewSponsor.setLayoutManager(layoutManager);
                                 binding.recViewSponsor.setAdapter(sponsorAdapter);
-                                binding.recViewSponsor.setItemTransitionTimeMillis(500);
 
-                                 binding.tvNoData1.setVisibility(View.GONE);
+                                startTimer();
 
-                                if (sponsorsList.size()>1)
-                                {
-                                    timer2 = new Timer();
-                                    timerTask2 = new MyTimerTask2();
-                                    timer2.scheduleAtFixedRate(timerTask2,0,1);
-
-                                }
-                            }else
-                            {
+                            } else {
                                 binding.tvNoData1.setVisibility(View.VISIBLE);
 
                             }
+
 
                         } else {
                             try {
@@ -457,7 +403,6 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
@@ -472,16 +417,14 @@ public class Fragment_Home extends Fragment {
                     public void onResponse(Call<IndustrialAreaDataModel> call, Response<IndustrialAreaDataModel> response) {
                         binding.progBarIndustrialArea.setVisibility(View.GONE);
 
-                        if (response.isSuccessful() && response.body() != null&&response.body().getIndustrialAreas()!=null) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getIndustrialAreas() != null) {
 
                             industrialAreaModelList.clear();
                             industrialAreaModelList.addAll(response.body().getIndustrialAreas());
-                            if (industrialAreaModelList.size()>0)
-                            {
+                            if (industrialAreaModelList.size() > 0) {
                                 industrialAreaAdapter.notifyDataSetChanged();
                                 binding.tvNoData4.setVisibility(View.GONE);
-                            }else
-                            {
+                            } else {
                                 binding.tvNoData4.setVisibility(View.VISIBLE);
 
                             }
@@ -523,7 +466,6 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
@@ -538,16 +480,14 @@ public class Fragment_Home extends Fragment {
                     public void onResponse(Call<FeaturedCategoryDataModel> call, Response<FeaturedCategoryDataModel> response) {
                         binding.progBarCategory.setVisibility(View.GONE);
 
-                        if (response.isSuccessful() && response.body() != null&&response.body().getFeatured_cats()!=null) {
+                        if (response.isSuccessful() && response.body() != null && response.body().getFeatured_cats() != null) {
 
                             featuredCategoryModelList.clear();
                             featuredCategoryModelList.addAll(response.body().getFeatured_cats());
-                            if (featuredCategoryModelList.size()>0)
-                            {
+                            if (featuredCategoryModelList.size() > 0) {
                                 featuredCategoryAdapter.notifyDataSetChanged();
                                 binding.tvNoData3.setVisibility(View.GONE);
-                            }else
-                            {
+                            } else {
                                 binding.tvNoData3.setVisibility(View.VISIBLE);
 
                             }
@@ -589,7 +529,6 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
@@ -603,15 +542,17 @@ public class Fragment_Home extends Fragment {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
 
+                        dialogSpinnerLocationBinding.progBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
 
-                            if (response.body().size()>0)
-                            {
+                            if (response.body().size() > 0) {
                                 spinnerLocationModelList.addAll(response.body());
-                                activity.runOnUiThread(()->{
-                                    spinnerLocationAdapter.notifyDataSetChanged();
-                                });
-                            }
+                                spinnerLocationAdapter.notifyDataSetChanged();
+                            }else
+                                {
+                                    dialogSpinnerLocationBinding.tvNoData.setVisibility(View.GONE);
+
+                                }
 
                         } else {
                             try {
@@ -636,6 +577,8 @@ public class Fragment_Home extends Fragment {
                     @Override
                     public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
                         try {
+                            dialogSpinnerLocationBinding.progBar.setVisibility(View.GONE);
+
                             if (t.getMessage() != null) {
                                 Log.e("error", t.getMessage());
                                 if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
@@ -647,7 +590,6 @@ public class Fragment_Home extends Fragment {
 
                         } catch (Exception e) {
                         }
-
 
 
                     }
@@ -658,17 +600,27 @@ public class Fragment_Home extends Fragment {
     private void getCategoryListing() {
 
         Api.getService(Tags.base_url1).
-                getListingCategory().
+                getListingCategory(1).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+                        dialogSpinnerCategoryBinding.progBar.setVisibility(View.GONE);
+                        totalPageCategory = Integer.parseInt(response.headers().get("X-WP-TotalPages"));
 
+                        if (totalPageCategory>1)
+                        {
+                            dialogSpinnerCategoryBinding.cardMore.setVisibility(View.VISIBLE);
+                        }else
+                            {
+                                dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
+
+                            }
                         if (response.isSuccessful() && response.body() != null) {
 
-                            if (response.body().size()>0)
-                            {
-                                spinnerCategoryListingModelList.addAll(response.body());
-                                updateSpinnerCategoryListing(spinnerCategoryListingModelList);
+                            if (response.body().size() > 0) {
+                                updateSpinnerCategoryListing(response.body(), 1);
+                            } else {
+                                dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
 
                         } else {
@@ -707,143 +659,337 @@ public class Fragment_Home extends Fragment {
                         }
 
 
-
                     }
                 });
 
     }
 
-    private void updateSpinnerCategoryListing(List<SpinnerModel> spinnerCategoryListingModelList) {
+    private void loadMoreCategoryListing(int page) {
+        Api.getService(Tags.base_url1).
+                getListingCategory(page).
+                enqueue(new Callback<List<SpinnerModel>>() {
+                    @Override
+                    public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        if (response.isSuccessful() && response.body() != null) {
 
 
-        if (spinnerCategoryListingModelList.size()>0)
-        {
-            if (lang.equals("ar"))
-            {
-                selectedListingModelList.addAll(getArCategoryListing());
-                spinnerCategoryListingAdapter.notifyDataSetChanged();
-            }else
+                            if (response.body().size() > 0) {
+                                currentPageCategory = page;
+                                updateSpinnerCategoryListing(response.body(), 2);
+                            } else {
+                                dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
+                            }
+
+                        } else {
+
+                            spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                            spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                            isLoadingCategory = false;
+
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(activity, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else {
+                                Toast.makeText(activity, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SpinnerModel>> call, Throwable t) {
+                        try {
+                            spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                            spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                            isLoadingCategory = false;
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+                    }
+                });
+    }
+
+    private void updateSpinnerCategoryListing(List<SpinnerModel> list, int type) {
+
+        if (list.size() > 0) {
+            int old_pos = list.size() - 1;
+            if (lang.equals("ar")) {
+                if (type ==2)
                 {
-                    selectedListingModelList.addAll(getEnCategoryListing());
-                    spinnerCategoryListingAdapter.notifyDataSetChanged();
+                    this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
+                    spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
+                    isLoadingCategory = false;
                 }
+                this.spinnerCategoryListingModelList.addAll(getArCategoryListing(list));
+                dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+            } else {
+
+                if (type ==2)
+                {
+                    this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
+                    spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
+                    isLoadingCategory = false;
+                }
+                this.spinnerCategoryListingModelList.addAll(getEnCategoryListing(list));
+            }
+
+            if (type == 1)// is normal data
+            {
+                spinnerCategoryAdapter.notifyDataSetChanged();
+
+            } else // is load more
+            {
+
+
+                spinnerCategoryAdapter.notifyItemRangeChanged(old_pos, this.spinnerCategoryListingModelList.size());
+            }
 
 
         }
     }
 
-    private List<SpinnerModel> getArCategoryListing()
-    {
+    private List<SpinnerModel> getArCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
-        int end = spinnerCategoryListingModelList.size()/2;
 
-        for (int i =0; i<end;i++)
-        {
-            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+        for (int i = 0; i < (list.size() / 2); i++) {
+            spinnerModelList.add(list.get(i));
+
         }
 
         return spinnerModelList;
     }
 
 
-    private List<SpinnerModel> getEnCategoryListing()
-    {
+    private List<SpinnerModel> getEnCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
-        int start = spinnerCategoryListingModelList.size()/2;
 
-        for (int i =start; i<spinnerCategoryListingModelList.size();i++)
-        {
-            Log.e("dididi",spinnerCategoryListingModelList.get(i).getId()+"_");
-            spinnerModelList.add(spinnerCategoryListingModelList.get(i));
+        for (int i = ((list.size() / 2) + 1); i < list.size(); i++) {
+            spinnerModelList.add(list.get(i));
+
         }
 
         return spinnerModelList;
     }
+
+
+    private void createCategoryDialog()
+    {
+
+        categoryDialog = new AlertDialog.Builder(activity)
+                .create();
+        LinearLayoutManager manager = new LinearLayoutManager(activity);
+        dialogSpinnerCategoryBinding = DataBindingUtil.inflate(LayoutInflater.from(activity), R.layout.dialog_spinner, null, false);
+        dialogSpinnerCategoryBinding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        dialogSpinnerCategoryBinding.recView.setLayoutManager(manager);
+        dialogSpinnerCategoryBinding.recView.setAdapter(spinnerCategoryAdapter);
+
+        dialogSpinnerCategoryBinding.btnLoadMore.setOnClickListener(view ->
+        {
+            if (!isLoadingCategory) {
+
+                int page = currentPageCategory + 1;
+                if (page <= totalPageCategory) {
+                    spinnerCategoryListingModelList.add(null);
+                    spinnerCategoryAdapter.notifyItemInserted(spinnerCategoryListingModelList.size() - 1);
+                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+
+                    loadMoreCategoryListing(page);
+                }else
+                {
+                    dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
+
+                }
+            }
+        });
+
+
+
+        dialogSpinnerCategoryBinding.btnCancel.setOnClickListener(v -> categoryDialog.dismiss()
+
+        );
+        categoryDialog.getWindow().getAttributes().windowAnimations = R.style.dialog_congratulation_animation;
+        categoryDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_window_bg);
+        categoryDialog.setCanceledOnTouchOutside(false);
+        categoryDialog.setView(dialogSpinnerCategoryBinding.getRoot());
+
+    }
+
+    private void createLocationDialog()
+    {
+
+        locationDialog = new AlertDialog.Builder(activity)
+                .create();
+        LinearLayoutManager manager = new LinearLayoutManager(activity);
+        dialogSpinnerLocationBinding = DataBindingUtil.inflate(LayoutInflater.from(activity), R.layout.dialog_spinner, null, false);
+        dialogSpinnerLocationBinding.progBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(activity, R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
+        dialogSpinnerLocationBinding.recView.setLayoutManager(manager);
+        dialogSpinnerLocationBinding.recView.setAdapter(spinnerLocationAdapter);
+
+        dialogSpinnerLocationBinding.btnLoadMore.setVisibility(View.GONE);
+
+
+        dialogSpinnerLocationBinding.btnCancel.setOnClickListener(v -> locationDialog.dismiss()
+
+        );
+        locationDialog.getWindow().getAttributes().windowAnimations = R.style.dialog_congratulation_animation;
+        locationDialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_window_bg);
+        locationDialog.setCanceledOnTouchOutside(false);
+        locationDialog.setView(dialogSpinnerLocationBinding.getRoot());
+
+    }
+
 
     public void setItemData() {
 
-        activity.DisplayFragmentDirectory(0,"",0,0);
+        activity.DisplayFragmentDirectory(0, "", 0, 0,cat_name,loc_name);
     }
 
-
-    private class MyTimerTask extends TimerTask{
-        @Override
-        public void run() {
-            activity.runOnUiThread(() -> {
-                if (binding.pager.getCurrentItem()<binding.pager.getAdapter().getCount()-1)
-                {
-                    binding.pager.setCurrentItem(binding.pager.getCurrentItem()+1);
-                }else
-                    {
-                        binding.pager.setCurrentItem(0);
-                    }
-            });
-        }
-    }
-
-    private class MyTimerTask2 extends TimerTask{
-        @Override
-        public void run() {
-
-
-            activity.runOnUiThread(() -> {
-
-
-                if (binding.recViewSponsor.getCurrentItem()<Integer.MAX_VALUE)
-                {
-                    try {
-                        int item = binding.recViewSponsor.getCurrentItem()+1;
-                        binding.recViewSponsor.smoothScrollToPosition(item);
-                    }catch (Exception e){}
-
-
-
-
-
-                }else
-                    {
-                        timerTask2.cancel();
-                        timer2.cancel();
-                        timer2.purge();
-
-                        binding.recViewSponsor.postDelayed(() -> binding.recViewSponsor.smoothScrollToPosition(0),1000);
-
-                        timer2 = new Timer();
-                        timerTask2 = new MyTimerTask2();
-                        timer2.scheduleAtFixedRate(timerTask2,0,500);
-                    }
-            });
-        }
-    }
-
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (timer!=null){
-
-            timer.cancel();
-            timer.purge();
-
-        }
-
-        if (timerTask!=null)
+    public void setCategoryData(SpinnerModel spinnerModel, int adapterPosition) {
+        if (adapterPosition!=0)
         {
-            timerTask.cancel();
+            Log.e("cat_id",spinnerModel.getId()+"_");
+
+            cat_name = spinnerModel.getName();
+            this.category_id = spinnerModel.getId();
+            binding.tvSpinnerCategory.setText(spinnerModel.getName());
+            categoryDialog.dismiss();
         }
 
-        if (timer2!=null){
+
+    }
+
+    public void setLocationData(SpinnerModel spinnerModel, int adapterPosition) {
+
+
+        if (adapterPosition!=0)
+        {
+            if (adapterPosition==1)
+            {
+                locationDialog.dismiss();
+
+            }else
+            {
+                Log.e("loc_id",spinnerModel.getId()+"_");
+                loc_name = spinnerModel.getName();
+                location_id = spinnerModel.getId();
+                binding.tvSpinnerLocation.setText(spinnerModel.getName());
+                locationDialog.dismiss();
+            }
+
+        }
+    }
+
+
+    private class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            activity.runOnUiThread(() -> {
+                if (binding.pager.getCurrentItem() < binding.pager.getAdapter().getCount() - 1) {
+                    binding.pager.setCurrentItem(binding.pager.getCurrentItem() + 1);
+                } else {
+                    binding.pager.setCurrentItem(0);
+                }
+            });
+        }
+    }
+
+
+    private class MyTimerTask2 extends TimerTask {
+        @Override
+        public void run() {
+
+
+            activity.runOnUiThread(() -> {
+
+
+                try {
+                    int item = layoutManager.getCurrentPosition() + 1;
+
+                    if (item < sponsorsList.size()) {
+                        ScrollHelper.smoothScrollToTargetView(binding.recViewSponsor, binding.recViewSponsor.findViewHolderForLayoutPosition(item).itemView);
+
+                    } else {
+                        item = 0;
+                        ScrollHelper.smoothScrollToTargetView(binding.recViewSponsor, binding.recViewSponsor.findViewHolderForLayoutPosition(item).itemView);
+
+                    }
+                } catch (Exception e) {
+                }
+            });
+        }
+    }
+
+
+    public void stopTimer() {
+        if (timer2 != null) {
 
             timer2.cancel();
             timer2.purge();
 
         }
 
-        if (timerTask2!=null)
-        {
+        if (timerTask2 != null) {
             timerTask2.cancel();
         }
+    }
+
+    public void startTimer() {
+        if (sponsorsList.size() > 1) {
+            timer2 = new Timer();
+            timerTask2 = new MyTimerTask2();
+            timer2.scheduleAtFixedRate(timerTask2, 0, 2000);
+
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (timer != null) {
+
+            timer.cancel();
+            timer.purge();
+
+        }
+
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+
+        stopTimer();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        startTimer();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        stopTimer();
     }
 }

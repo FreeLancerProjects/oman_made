@@ -138,6 +138,6 @@ public class Fragment_Industry extends Fragment {
 
     public void setItemData() {
 
-        activity.DisplayFragmentDirectory(0,"",0,0);
+        activity.DisplayFragmentDirectory(0,"",0,0,"","");
     }
 }

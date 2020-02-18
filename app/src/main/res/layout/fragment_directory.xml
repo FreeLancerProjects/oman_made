@@ -86,18 +86,51 @@
 
 
                                 <FrameLayout
+                                    android:id="@+id/spinnerLocation"
                                     android:layout_width="0dp"
                                     android:layout_height="35dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/spinner_bg"
                                     >
-                                    <Spinner
-                                        android:id="@+id/spinnerLocation"
+                                    <androidx.constraintlayout.widget.ConstraintLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:spinnerMode="dialog"
+                                        android:clickable="false"
+                                        android:longClickable="false"
 
-                                        />
+                                        >
+                                        <TextView
+                                            android:id="@+id/tvSpinnerLocation"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            android:textColor="@color/black"
+                                            android:textSize="13sp"
+                                            android:gravity="center"
+                                            android:singleLine="true"
+                                            app:layout_constraintEnd_toStartOf="@id/icon1"
+                                            app:layout_constraintHorizontal_bias=".5"
+                                            app:layout_constraintWidth_default="wrap"
+                                            android:clickable="false"
+                                            android:longClickable="false"
+                                            />
+                                        <ImageView
+                                            android:id="@+id/icon1"
+                                            android:layout_width="20dp"
+                                            android:layout_height="20dp"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            android:src="@drawable/ic_spinner_arrow"
+                                            android:padding="5dp"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_marginEnd="8dp"
+                                            android:clickable="false"
+                                            android:longClickable="false"
+                                            />
+                                    </androidx.constraintlayout.widget.ConstraintLayout>
                                 </FrameLayout>
 
                                 <View
@@ -105,19 +138,52 @@
                                     android:layout_height="2dp"/>
 
                                 <FrameLayout
+                                    android:id="@+id/spinnerCategory"
                                     android:layout_width="0dp"
                                     android:layout_height="35dp"
                                     android:layout_weight="1"
                                     android:background="@drawable/spinner_bg"
                                     >
-                                    <Spinner
-                                        android:id="@+id/spinnerCategoryListing"
-
+                                    <androidx.constraintlayout.widget.ConstraintLayout
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
-                                        android:spinnerMode="dialog"
+                                        android:clickable="false"
+                                        android:longClickable="false"
 
-                                        />
+                                        >
+                                        <TextView
+                                            android:id="@+id/tvSpinnerCategory"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintStart_toStartOf="parent"
+                                            android:textColor="@color/black"
+                                            android:textSize="13sp"
+                                            android:gravity="center"
+                                            android:singleLine="true"
+                                            app:layout_constraintEnd_toStartOf="@id/icon2"
+                                            app:layout_constraintHorizontal_bias=".5"
+                                            app:layout_constraintWidth_default="wrap"
+                                            android:clickable="false"
+                                            android:longClickable="false"
+                                            />
+                                        <ImageView
+                                            android:id="@+id/icon2"
+                                            android:layout_width="20dp"
+                                            android:layout_height="20dp"
+                                            app:layout_constraintTop_toTopOf="parent"
+                                            app:layout_constraintBottom_toBottomOf="parent"
+                                            app:layout_constraintEnd_toEndOf="parent"
+                                            android:src="@drawable/ic_spinner_arrow"
+                                            android:padding="5dp"
+                                            android:layout_marginStart="8dp"
+                                            android:layout_marginEnd="8dp"
+                                            android:clickable="false"
+                                            android:longClickable="false"
+                                            />
+                                    </androidx.constraintlayout.widget.ConstraintLayout>
+
                                 </FrameLayout>
 
 

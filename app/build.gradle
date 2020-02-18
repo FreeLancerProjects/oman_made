@@ -62,7 +62,8 @@ dependencies {
     implementation 'com.yarolegovich:discrete-scrollview:1.4.9'
     implementation 'com.google.maps.android:android-maps-utils:0.5'
     implementation 'org.jsoup:jsoup:1.12.1'
-    implementation 'com.asksira.android:loopingviewpager:1.2.0'
+
+    implementation 'rouchuan.viewpagerlayoutmanager:viewpagerlayoutmanager:2.0.22'
 
 
 }

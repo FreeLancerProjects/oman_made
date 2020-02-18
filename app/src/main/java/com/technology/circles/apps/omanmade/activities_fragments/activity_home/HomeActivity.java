@@ -319,7 +319,7 @@ public class HomeActivity extends AppCompatActivity {
             new Handler()
                     .postDelayed(() -> {
                         drawer.closeDrawer(GravityCompat.START);
-                        DisplayFragmentDirectory(0,"",0,0);
+                        DisplayFragmentDirectory(0,"",0,0,"","");
                     }, 500);
 
 
@@ -638,7 +638,7 @@ public class HomeActivity extends AppCompatActivity {
                     DisplayFragmentHome();
                     break;
                 case 1:
-                    DisplayFragmentDirectory(0,"",0,0);
+                    DisplayFragmentDirectory(0,"",0,0,"","");
                     break;
                 case 2:
                     DisplayFragmentIndustrialArea();
@@ -676,6 +676,7 @@ public class HomeActivity extends AppCompatActivity {
 
         if (fragment_home.isAdded()) {
             fragmentManager.beginTransaction().show(fragment_home).commit();
+            fragment_home.startTimer();
 
         } else {
             fragmentManager.beginTransaction().add(R.id.fragment_home_container, fragment_home, "fragment_home").addToBackStack("fragment_home").commit();
@@ -685,13 +686,14 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    public void DisplayFragmentDirectory(int type,String query,int category_id,int location_id) {
+    public void DisplayFragmentDirectory(int type,String query,int category_id,int location_id,String category_name,String location_name) {
 
         if (fragment_directory == null) {
-            fragment_directory = Fragment_Directory.newInstance(query, category_id, location_id);
+            fragment_directory = Fragment_Directory.newInstance(query, category_id, location_id,category_name,location_name);
         }
 
         if (fragment_home != null && fragment_home.isAdded()) {
+            fragment_home.stopTimer();
             fragmentManager.beginTransaction().hide(fragment_home).commit();
         }
 
@@ -716,6 +718,8 @@ public class HomeActivity extends AppCompatActivity {
             fragmentManager.beginTransaction().add(R.id.fragment_home_container, fragment_directory, "fragment_directory").addToBackStack("fragment_directory").commit();
 
         }
+
+
         ah_bottom_nav.setCurrentItem(1, false);
 
 
@@ -729,6 +733,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if (fragment_home != null && fragment_home.isAdded()) {
+            fragment_home.stopTimer();
+
             fragmentManager.beginTransaction().hide(fragment_home).commit();
         }
 
@@ -760,6 +766,8 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         if (fragment_home != null && fragment_home.isAdded()) {
+            fragment_home.stopTimer();
+
             fragmentManager.beginTransaction().hide(fragment_home).commit();
         }
 

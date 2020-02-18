@@ -4,6 +4,7 @@ public class Tags {
 
     public static String base_url1 = "https://www.omanmade.com/";
     public static String base_url2 = "http://mobile.omanmade.com/";
+
     public static String IMAGE_URL_SPONSOR = base_url2+"storage/sponsors/";
     public static String IMAGE_URL_SLIDER = base_url2+"storage/slider/";
     public static String IMAGE_URL_FEATURED_CATEGORY = base_url2+"storage/cats/";

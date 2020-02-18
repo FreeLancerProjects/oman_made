@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:fillViewport="true"
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/dialog_window_bg">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recView"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"/>
+                <ProgressBar
+                    android:id="@+id/progBar"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    />
+                <TextView
+                    android:id="@+id/tvNoData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:text="@string/no_data_to_show"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="10dp"
+
+                >
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardMore"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardElevation="3dp"
+                    app:cardCornerRadius="20dp"
+                    android:layout_margin="3dp"
+                    android:visibility="gone"
+
+
+                    >
+
+                    <Button
+                        android:id="@+id/btnLoadMore"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/transparent"
+                        android:text="@string/more"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="5dp"
+                        />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    app:cardBackgroundColor="@color/white"
+                    app:cardElevation="3dp"
+                    app:cardCornerRadius="20dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:layout_marginBottom="3dp"
+
+                    >
+
+                    <Button
+                        android:id="@+id/btnCancel"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/transparent"
+                        android:text="@string/cancel"
+                        android:textColor="@color/gray5"
+                        android:layout_marginTop="5dp"
+                        />
+                </androidx.cardview.widget.CardView>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</layout>
