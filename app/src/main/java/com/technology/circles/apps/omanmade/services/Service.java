@@ -84,7 +84,7 @@ public interface Service {
     Call<List<SpinnerModel>> getLocation(@Query("parent") int lang);
 
     @GET("wp-json/wp/v2/listing_categories")
-    Call<List<SpinnerModel>> getListingCategory(@Query("page")int page);
+    Call<List<SpinnerModel>> getListingCategory(@Query("page") int page);
 
 
     @GET("api/dir-ads")
@@ -112,6 +112,15 @@ public interface Service {
 
     );
 
+    @GET("wp-json/wp/v2/business/{web_id}")
+    Call<BusinessDataModel> getBusinessByWebId(@Path("web_id") String web_id);
+
+    @GET("wp-json/wp/v2/business")
+    Call<List<BusinessDataModel>> getBusinessByWebId2(@Query("lang") String lang,
+                                                      @Query("page") int page,
+                                                      @Query("listing_categories") String listing_categories
+
+    );
 
 }
 

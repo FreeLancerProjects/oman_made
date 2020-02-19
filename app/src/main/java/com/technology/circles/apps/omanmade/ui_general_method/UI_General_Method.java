@@ -1,5 +1,6 @@
 package com.technology.circles.apps.omanmade.ui_general_method;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.View;
 import android.widget.EditText;
@@ -344,7 +345,62 @@ public class UI_General_Method {
 
 
 
+    @BindingAdapter({"imageLink","imageColor"})
+    public static void imageLink(View view,String imageLink,String imageColor)
+    {
+        if (view instanceof CircleImageView)
+        {
+            CircleImageView imageView = (CircleImageView) view;
+            if (imageColor!=null)
+            {
+                imageView.setColorFilter(Color.parseColor(imageColor));
 
+            }
+
+
+            if (imageLink!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(imageLink)).into(imageView);
+            }
+        }else if (view instanceof RoundedImageView)
+        {
+            RoundedImageView imageView = (RoundedImageView) view;
+            if (imageColor!=null)
+            {
+                imageView.setColorFilter(Color.parseColor(imageColor));
+
+            }            if (imageLink!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(imageLink)).into(imageView);
+            }
+        }else if (view instanceof ImageView)
+        {
+            ImageView imageView = (ImageView) view;
+            if (imageColor!=null)
+            {
+                imageView.setColorFilter(Color.parseColor(imageColor));
+
+            }
+            if (imageLink!=null)
+            {
+
+                Picasso.with(imageView.getContext()).load(Uri.parse(imageLink)).into(imageView);
+            }
+        }
+
+    }
+
+    @BindingAdapter("textColor")
+    public static void textColor(TextView textView ,String textColor)
+    {
+        if (textColor!=null)
+        {
+            textView.setTextColor(Color.parseColor(textColor));
+
+        }
+    }
     @BindingAdapter({"date"})
     public static void displayTime(TextView textView,long time)
     {

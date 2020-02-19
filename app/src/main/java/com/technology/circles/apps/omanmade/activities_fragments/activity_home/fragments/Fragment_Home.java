@@ -1,5 +1,6 @@
 package com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.leochuan.ScaleLayoutManager;
 import com.leochuan.ScrollHelper;
 import com.leochuan.ViewPagerLayoutManager;
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_business_details.BusinessDetailsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.HomeActivity;
 import com.technology.circles.apps.omanmade.adapter.FeatureListingAdapter;
 import com.technology.circles.apps.omanmade.adapter.FeaturedCategoryAdapter;
@@ -867,7 +869,6 @@ public class Fragment_Home extends Fragment {
     public void setCategoryData(SpinnerModel spinnerModel, int adapterPosition) {
         if (adapterPosition!=0)
         {
-            Log.e("cat_id",spinnerModel.getId()+"_");
 
             cat_name = spinnerModel.getName();
             this.category_id = spinnerModel.getId();
@@ -889,7 +890,6 @@ public class Fragment_Home extends Fragment {
 
             }else
             {
-                Log.e("loc_id",spinnerModel.getId()+"_");
                 loc_name = spinnerModel.getName();
                 location_id = spinnerModel.getId();
                 binding.tvSpinnerLocation.setText(spinnerModel.getName());
@@ -897,6 +897,16 @@ public class Fragment_Home extends Fragment {
             }
 
         }
+    }
+
+    public void setFeaturedItemData(FeatureListingDataModel.FeatureModel featureModel) {
+
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+
+        intent.putExtra("web_id",String.valueOf(32010));
+        intent.putExtra("from",1);
+        startActivity(intent);
+
     }
 
 

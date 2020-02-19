@@ -72,5 +72,15 @@
     <string name="listing_match_your_search">Listing match your search</string>
     <string name="no_image">No image</string>
     <string name="clear">Clear</string>
+    <string name="description">Description</string>
+    <string name="details">Details</string>
+    <string name="contact_details">Contact Details</string>
+    <string name="business_details">Business Details</string>
+    <string name="opening_hours">Opening Hours</string>
+    <string name="website">Website</string>
+    <string name="person">Person</string>
+    <string name="location">Location</string>
+    <string name="slogan">Slogan</string>
+    <string name="location_on_map">Location on map</string>
 
 </resources>

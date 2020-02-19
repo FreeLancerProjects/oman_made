@@ -1299,14 +1299,14 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
             for (BusinessDataModel model: businessDataModelList)
             {
-                if (model.getCmb2().getListing_map_location()!=null)
+                if (model.getCmb2().getListing_business_location()!=null)
                 {
-                    if (!model.getCmb2().getListing_map_location().getLatitude().isEmpty()&&model.getCmb2().getListing_map_location().getLongitude().isEmpty())
+                    if (!model.getCmb2().getListing_business_location().getListing_map_location().getLatitude().isEmpty()&&model.getCmb2().getListing_business_location().getListing_map_location().getLongitude().isEmpty())
                     {
-                        double lat =Double.parseDouble(model.getCmb2().getListing_map_location().getLatitude());
-                        double lng =Double.parseDouble(model.getCmb2().getListing_map_location().getLongitude());
+                        double lat =Double.parseDouble(model.getCmb2().getListing_business_location().getListing_map_location().getLatitude());
+                        double lng =Double.parseDouble(model.getCmb2().getListing_business_location().getListing_map_location().getLongitude());
 
-                        locationList.add(new ClusterLocation(model.getCmb2().getListing_map_location().getAddress(),new LatLng(lat,lng)));
+                        locationList.add(new ClusterLocation(model.getCmb2().getListing_business_location().getListing_map_location().getAddress(),new LatLng(lat,lng)));
 
                     }
 
@@ -1328,13 +1328,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
     public void setItemData(BusinessDataModel model) {
 
-        if (model.getCmb2().getListing_business_location().getListing_locations() instanceof String) {
-            String s = (String) model.getCmb2().getListing_business_location().getListing_locations();
-            Log.e("sssss", s + "__");
-        } else if (model.getCmb2().getListing_business_location().getListing_locations() instanceof List) {
-            List<String> loc = (List<String>) model.getCmb2().getListing_business_location().getListing_locations();
-            Log.e("sss", loc.size() + "_");
-        }
 
     }
 

@@ -1,6 +1,7 @@
 package com.technology.circles.apps.omanmade.models;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class BusinessDataModel implements Serializable {
     private int id;
@@ -59,6 +60,8 @@ public class BusinessDataModel implements Serializable {
 
     public class Cmb2 implements Serializable
     {
+        private Listing_Business_General listing_business_general;
+
         private Opening_Hour listing_business_opening_hours;
 
         private Listing_Business_Contact listing_business_contact;
@@ -67,7 +70,17 @@ public class BusinessDataModel implements Serializable {
 
         private Listing_Business_Location listing_business_location;
 
-        private Listing_Map_Location listing_map_location;
+        private Listing_Business_Branding listing_business_branding;
+
+        private Listing_Gallery listing_gallery;
+
+        public Listing_Business_General getListing_business_general() {
+            return listing_business_general;
+        }
+
+        public Listing_Gallery getListing_gallery() {
+            return listing_gallery;
+        }
 
         public Opening_Hour getListing_business_opening_hours() {
             return listing_business_opening_hours;
@@ -85,8 +98,8 @@ public class BusinessDataModel implements Serializable {
             return listing_business_location;
         }
 
-        public Listing_Map_Location getListing_map_location() {
-            return listing_map_location;
+        public Listing_Business_Branding getListing_business_branding() {
+            return listing_business_branding;
         }
     }
     public static class Opening_Hour implements Serializable
@@ -104,6 +117,32 @@ public class BusinessDataModel implements Serializable {
         private String listing_time_from;
         private String listing_time_to;
         private String listing_custom;
+
+        public OpeningHourList() {
+        }
+
+        public OpeningHourList(String listing_day, String listing_time_from, String listing_time_to, String listing_custom) {
+            this.listing_day = listing_day;
+            this.listing_time_from = listing_time_from;
+            this.listing_time_to = listing_time_to;
+            this.listing_custom = listing_custom;
+        }
+
+        public void setListing_day(String listing_day) {
+            this.listing_day = listing_day;
+        }
+
+        public void setListing_time_from(String listing_time_from) {
+            this.listing_time_from = listing_time_from;
+        }
+
+        public void setListing_time_to(String listing_time_to) {
+            this.listing_time_to = listing_time_to;
+        }
+
+        public void setListing_custom(String listing_custom) {
+            this.listing_custom = listing_custom;
+        }
 
         public String getListing_day() {
             return listing_day;
@@ -214,9 +253,13 @@ public class BusinessDataModel implements Serializable {
     public static class Listing_Business_Location implements Serializable
     {
         private Object listing_locations;
-
+        private Listing_Map_Location listing_map_location;
         public Object getListing_locations() {
             return listing_locations;
+        }
+
+        public Listing_Map_Location getListing_map_location() {
+            return listing_map_location;
         }
     }
 
@@ -239,5 +282,49 @@ public class BusinessDataModel implements Serializable {
         }
     }
 
+    public static class Listing_Business_General implements Serializable
+    {
+        private String listing_title;
+        private String listing_featured_image;
+        private String listing_description;
 
+        public String getListing_title() {
+            return listing_title;
+        }
+
+        public String getListing_description() {
+            return listing_description;
+        }
+
+        public String getListing_featured_image() {
+            return listing_featured_image;
+        }
+    }
+
+    public static class Listing_Business_Branding implements Serializable
+    {
+        private String listing_slogan;
+        private String listing_brand_color;
+        private String listing_logo;
+
+        public String getListing_slogan() {
+            return listing_slogan;
+        }
+
+        public String getListing_brand_color() {
+            return listing_brand_color;
+        }
+
+        public String getListing_logo() {
+            return listing_logo;
+        }
+    }
+    public static class Listing_Gallery implements Serializable
+    {
+        private Map<String,String> map;
+
+        public Map<String, String> getMap() {
+            return map;
+        }
+    }
 }

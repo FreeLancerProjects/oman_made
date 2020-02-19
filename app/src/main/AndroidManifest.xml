@@ -24,10 +24,14 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:icon"
         tools:targetApi="m">
-        <activity android:name=".activities_fragments.activity_web_view.WebViewActivity"
+        <activity android:name=".activities_fragments.activity_business_details.BusinessDetailsActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             />
+        <activity
+            android:name=".activities_fragments.activity_web_view.WebViewActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
         <activity
             android:name=".activities_fragments.activity_service.ServiceActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"

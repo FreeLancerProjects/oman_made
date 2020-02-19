@@ -79,5 +79,15 @@
     <string name="listing_match_your_search">نتائج البحث</string>
     <string name="no_image">لايوجد صورة</string>
     <string name="clear">حذف النتائج</string>
+    <string name="description">التفاصيل</string>
+    <string name="details">التفاصيل</string>
+    <string name="contact_details">تفاصيل التواصل</string>
+    <string name="business_details">تفاصيل العمل</string>
+    <string name="opening_hours">أوقات العمل</string>
+    <string name="website">الموقع</string>
+    <string name="person">الإسم</string>
+    <string name="location">الموقع</string>
+    <string name="slogan">الشعار</string>
+    <string name="location_on_map">الموقع على الخريطة</string>
 
 </resources>
