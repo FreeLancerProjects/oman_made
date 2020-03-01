@@ -260,6 +260,18 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
             binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
 
+            if (clusterManager!=null)
+            {
+                clusterManager.clearItems();
+                locationList.clear();
+                clusterManager.cluster();
+            }
+
+            if (mMap!=null)
+            {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(20.687852357971384, 56.02986674755812), 7.1496434f));
+
+            }
             getBusiness();
 
         });
