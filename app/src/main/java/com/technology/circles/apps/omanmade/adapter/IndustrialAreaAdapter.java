@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.databinding.IndustrialAreaRow1Binding;
 import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
 
@@ -48,6 +49,15 @@ public class IndustrialAreaAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         MyHolder myHolder = (MyHolder) holder;
 
         myHolder.binding.setModel(list.get(position));
+
+        myHolder.itemView.setOnClickListener(view -> {
+            if (fragment instanceof Fragment_Home)
+            {
+
+                Fragment_Home fragment_home = (Fragment_Home) fragment;
+                fragment_home.setItemDataIndustrialArea(list.get(myHolder.getAdapterPosition()));
+            }
+        });
 
     }
 

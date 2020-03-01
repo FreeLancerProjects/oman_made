@@ -1,5 +1,6 @@
 package com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,9 +23,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_business_details.BusinessDetailsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.HomeActivity;
 import com.technology.circles.apps.omanmade.adapter.BusinessAdapter;
 import com.technology.circles.apps.omanmade.adapter.DirectoryAdapter;
@@ -43,7 +46,9 @@ import com.technology.circles.apps.omanmade.tags.Tags;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.paperdb.Paper;
 import retrofit2.Call;
@@ -51,11 +56,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
-    private static final String TAG1="query";
-    private static final String TAG2="cat_id";
-    private static final String TAG3="loc_id";
-    private static final String TAG4="cat_name";
-    private static final String TAG5="loc_name";
+    private static final String TAG1 = "query";
+    private static final String TAG2 = "cat_id";
+    private static final String TAG3 = "loc_id";
+    private static final String TAG4 = "cat_name";
+    private static final String TAG5 = "loc_name";
 
     private FragmentDirectoryBinding binding;
     private HomeActivity activity;
@@ -75,34 +80,35 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private String query = "";
     private int cat_id = 0, location_id = 0;
     private int searchType = 0;
-    private int index =0;
+    private int index = 0;
     private List<BusinessDataModel> inCompleteBusinessDataModelList;
 
     private List<ClusterLocation> locationList;
     private ClusterManager clusterManager;
     private ClusterRender clusterRender;
 
-    private Call<List<BusinessDataModel>> call,callLoadMore,searchCall,searchLoadMoreCall;
-    private Call<MediaModel> callMedia,callLoadMoreMedia;
+    private Call<List<BusinessDataModel>> call, callLoadMore, searchCall, searchLoadMoreCall;
+    private Call<MediaModel> callMedia, callLoadMoreMedia;
 
     private AlertDialog categoryDialog, locationDialog;
 
-    private DialogSpinnerBinding dialogSpinnerCategoryBinding,dialogSpinnerLocationBinding;
+    private DialogSpinnerBinding dialogSpinnerCategoryBinding, dialogSpinnerLocationBinding;
     private int currentPageCategory = 1;
     private boolean isLoadingCategory = false;
     private int totalPageCategory = 1;
     private List<SpinnerModel> spinnerLocationModelList, spinnerCategoryListingModelList;
     private SpinnerLocationAdapter spinnerLocationAdapter, spinnerCategoryAdapter;
 
-    private String cat_name="",loc_name="";
-    public static Fragment_Directory newInstance(String query,int category_id,int location_id,String category_name,String location_name) {
+    private String cat_name = "", loc_name = "";
+
+    public static Fragment_Directory newInstance(String query, int category_id, int location_id, String category_name, String location_name) {
 
         Bundle bundle = new Bundle();
-        bundle.putString(TAG1,query);
-        bundle.putInt(TAG2,category_id);
-        bundle.putInt(TAG3,location_id);
-        bundle.putString(TAG4,category_name);
-        bundle.putString(TAG5,location_name);
+        bundle.putString(TAG1, query);
+        bundle.putInt(TAG2, category_id);
+        bundle.putInt(TAG3, location_id);
+        bundle.putString(TAG4, category_name);
+        bundle.putString(TAG5, location_name);
 
         Fragment_Directory fragment_directory = new Fragment_Directory();
         fragment_directory.setArguments(bundle);
@@ -167,7 +173,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
 
 
-
         binding.recViewSearch.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -184,7 +189,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         loadMoreBusiness(page);
 
                     } else if (searchType == 1) {
-                        loadMoreSearch(query,page,cat_id,location_id);
+                        loadMoreSearch(query, page, cat_id, location_id);
 
                     }
 
@@ -199,9 +204,9 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
         binding.spinnerLocation.setOnClickListener(view -> locationDialog.show());
 
-        spinnerCategoryAdapter = new SpinnerLocationAdapter(spinnerCategoryListingModelList, activity, this,1);
+        spinnerCategoryAdapter = new SpinnerLocationAdapter(spinnerCategoryListingModelList, activity, this, 1);
         createCategoryDialog();
-        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList, activity, this,2);
+        spinnerLocationAdapter = new SpinnerLocationAdapter(spinnerLocationModelList, activity, this, 2);
         createLocationDialog();
 
         ////////////////////////////////////////////////////
@@ -213,8 +218,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         });
 
         Bundle bundle = getArguments();
-        if (bundle!=null)
-        {
+        if (bundle != null) {
             query = bundle.getString(TAG1);
             cat_id = bundle.getInt(TAG2);
             location_id = bundle.getInt(TAG3);
@@ -224,58 +228,37 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
         }
 
-        if (cat_name.isEmpty())
-        {
+        if (cat_name.isEmpty()) {
             binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
-        }else
-            {
-                binding.tvSpinnerCategory.setText(cat_name);
+        } else {
+            binding.tvSpinnerCategory.setText(cat_name);
 
-            }
+        }
 
-        if (loc_name.isEmpty())
-        {
+        if (loc_name.isEmpty()) {
             binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
-        }else
-        {
+        } else {
             binding.tvSpinnerLocation.setText(loc_name);
 
         }
 
-        if (query.isEmpty()&&cat_id==0&&location_id==0)
-        {
+        if (query.isEmpty() && cat_id == 0 && location_id == 0) {
             getBusiness();
 
-        }else
-        {
-            search(query,cat_id,location_id);
+        } else {
+            search(query, cat_id, location_id);
         }
 
 
         binding.tvClear.setOnClickListener(view -> {
 
-            if (callMedia!=null)
-            {
-                callMedia.cancel();
-            }
-            if (callLoadMoreMedia!=null)
-            {
-                callLoadMoreMedia.cancel();
-                isLoading = false;
-            }
+            cat_id =0;
+            location_id =0;
+            query ="";
+            binding.edtKeyword.setText("");
 
-
-            if (searchCall!=null)
-            {
-                searchCall.cancel();
-            }
-
-            if (searchLoadMoreCall!=null)
-            {
-                searchLoadMoreCall.cancel();
-                isLoading = false;
-
-            }
+            binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
+            binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
 
             getBusiness();
 
@@ -284,7 +267,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         getLocation();
         getCategoryListing();
         getDirectory();
-
 
 
     }
@@ -361,35 +343,32 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         binding.tvClear.setVisibility(View.GONE);
         businessDataModelList.clear();
         businessAdapter.notifyDataSetChanged();
-        binding.progBarSearch.setVisibility(View.VISIBLE);
         binding.tvNoData2.setVisibility(View.GONE);
-        searchType =0;
+        searchType = 0;
+        isLoading = false;
 
-        if (searchCall!=null)
-        {
+        if (searchCall != null) {
             searchCall.cancel();
         }
-        if (searchLoadMoreCall!=null)
-        {
+        if (searchLoadMoreCall != null) {
             searchLoadMoreCall.cancel();
         }
-        if (callLoadMore!=null)
-        {
+        if (callLoadMore != null) {
             callLoadMore.cancel();
         }
-        if (callMedia!=null)
-        {
+        if (callMedia != null) {
             callMedia.cancel();
         }
 
-        if (callLoadMoreMedia!=null)
-        {
+        if (callLoadMoreMedia != null) {
             callLoadMoreMedia.cancel();
         }
 
-       call = Api.getService(Tags.base_url1).getBusiness(lang, 1);
+        binding.progBarSearch.setVisibility(View.VISIBLE);
 
-       call.enqueue(new Callback<List<BusinessDataModel>>() {
+        call = Api.getService(Tags.base_url1).getBusiness(lang, 1);
+
+        call.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
             public void onResponse(Call<List<BusinessDataModel>> call, Response<List<BusinessDataModel>> response) {
 
@@ -438,8 +417,12 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         Log.e("error", t.getMessage());
                         if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                             Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if (t.getMessage().toLowerCase().equals("Socket closed".toLowerCase())){
+                            binding.progBarSearch.setVisibility(View.VISIBLE);
+                        }else
+                        {
                             Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+
                         }
                     }
 
@@ -465,44 +448,41 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                     BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
                     model.setImagePath(response.body().getGuid().getRendered());
-                    inCompleteBusinessDataModelList.set(index,model);
+                    inCompleteBusinessDataModelList.set(index, model);
                     index++;
-                    if (index<inCompleteBusinessDataModelList.size())
-                    {
+                    if (index < inCompleteBusinessDataModelList.size()) {
                         getImages(inCompleteBusinessDataModelList.get(index).getFeatured_media());
-                    }else
-                        {
-                            binding.progBarSearch.setVisibility(View.GONE);
-
-                            index=0;
-
-                            businessDataModelList.clear();
-                            businessDataModelList.addAll(inCompleteBusinessDataModelList);
-                            businessAdapter.notifyDataSetChanged();
-                            addMarker();
-                        }
-
-                }else if (response.code()==404){
-
-                    BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
-                    model.setImagePath("");
-                    inCompleteBusinessDataModelList.set(index,model);
-                    index++;
-                    if (index<inCompleteBusinessDataModelList.size())
-                    {
-                        getImages(inCompleteBusinessDataModelList.get(index).getFeatured_media());
-                    }else
-                    {
+                    } else {
                         binding.progBarSearch.setVisibility(View.GONE);
 
-                        index=0;
+                        index = 0;
 
                         businessDataModelList.clear();
                         businessDataModelList.addAll(inCompleteBusinessDataModelList);
                         businessAdapter.notifyDataSetChanged();
                         addMarker();
                     }
-                }else {
+
+                } else if (response.code() == 404) {
+
+                    BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
+                    model.setImagePath("");
+                    inCompleteBusinessDataModelList.set(index, model);
+                    index++;
+                    if (index < inCompleteBusinessDataModelList.size()) {
+                        getImages(inCompleteBusinessDataModelList.get(index).getFeatured_media());
+                    } else {
+                        binding.progBarSearch.setVisibility(View.GONE);
+
+                        index = 0;
+
+                        businessDataModelList.clear();
+                        businessDataModelList.addAll(inCompleteBusinessDataModelList);
+                        businessAdapter.notifyDataSetChanged();
+
+                        addMarker();
+                    }
+                } else {
                     try {
 
                         Log.e("error", response.code() + "_" + response.errorBody().string());
@@ -523,9 +503,13 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         Log.e("error", t.getMessage());
                         if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                             Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
+                        } else if (t.getMessage().toLowerCase().equals("Socket closed".toLowerCase())){
+                            binding.progBarSearch.setVisibility(View.VISIBLE);
+                        }else
+                            {
+                                Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                            }
                     }
 
                 } catch (Exception e) {
@@ -545,20 +529,17 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             public void onResponse(Call<MediaModel> call, Response<MediaModel> response) {
 
 
-
                 if (response.isSuccessful() && response.body() != null && response.body().getGuid() != null) {
 
                     BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
                     model.setImagePath(response.body().getGuid().getRendered());
-                    inCompleteBusinessDataModelList.set(index,model);
+                    inCompleteBusinessDataModelList.set(index, model);
                     index++;
-                    if (index<inCompleteBusinessDataModelList.size())
-                    {
+                    if (index < inCompleteBusinessDataModelList.size()) {
 
                         getImagesLoadMore(inCompleteBusinessDataModelList.get(index).getFeatured_media());
-                    }else
-                    {
-                        index=0;
+                    } else {
+                        index = 0;
 
                         businessDataModelList.remove(businessDataModelList.size() - 1);
                         businessAdapter.notifyItemRemoved(businessDataModelList.size() - 1);
@@ -567,35 +548,33 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                         businessDataModelList.addAll(inCompleteBusinessDataModelList);
 
-                        Log.e("2","2");
+                        Log.e("2", "2");
 
                         if (inCompleteBusinessDataModelList.size() > 0) {
                             addMarker();
                             businessAdapter.notifyItemRangeChanged(oldPos, businessDataModelList.size() - 1);
                             currentPage += 1;
 
-                            Log.e("3","3");
+                            Log.e("3", "3");
 
 
                         }
 
                     }
 
-                }else if (response.code()==404){
+                } else if (response.code() == 404) {
 
                     BusinessDataModel model = inCompleteBusinessDataModelList.get(index);
                     model.setImagePath("");
-                    inCompleteBusinessDataModelList.set(index,model);
+                    inCompleteBusinessDataModelList.set(index, model);
                     index++;
-                    Log.e("4","4");
+                    Log.e("4", "4");
 
-                    if (index<inCompleteBusinessDataModelList.size())
-                    {
+                    if (index < inCompleteBusinessDataModelList.size()) {
 
                         getImagesLoadMore(inCompleteBusinessDataModelList.get(index).getFeatured_media());
-                    }else
-                    {
-                        Log.e("5","5");
+                    } else {
+                        Log.e("5", "5");
 
 
                         businessDataModelList.remove(businessDataModelList.size() - 1);
@@ -603,12 +582,12 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         isLoading = false;
                         int oldPos = businessDataModelList.size() - 1;
 
-                        index=0;
+                        index = 0;
                         businessDataModelList.addAll(inCompleteBusinessDataModelList);
 
 
                         if (inCompleteBusinessDataModelList.size() > 0) {
-                            Log.e("6","6");
+                            Log.e("6", "6");
 
                             addMarker();
 
@@ -617,7 +596,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                         }
                     }
-                }else {
+                } else {
                     try {
 
                         Log.e("error", response.code() + "_" + response.errorBody().string());
@@ -642,8 +621,12 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         Log.e("error", t.getMessage());
                         if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                             Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if (t.getMessage().toLowerCase().equals("Socket closed".toLowerCase())){
+                            binding.progBarSearch.setVisibility(View.VISIBLE);
+                        }else
+                        {
                             Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+
                         }
                     }
 
@@ -658,7 +641,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private void loadMoreBusiness(int page) {
         index = 0;
 
-        callLoadMore =  Api.getService(Tags.base_url1).getBusiness(lang, page);
+        callLoadMore = Api.getService(Tags.base_url1).getBusiness(lang, page);
 
         callLoadMore.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
@@ -671,19 +654,16 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                     inCompleteBusinessDataModelList.clear();
                     inCompleteBusinessDataModelList.addAll(response.body());
 
-                    Log.e("6",inCompleteBusinessDataModelList.size()+"_");
+                    Log.e("6", inCompleteBusinessDataModelList.size() + "_");
 
-                    if (inCompleteBusinessDataModelList.size()>0)
-                    {
+                    if (inCompleteBusinessDataModelList.size() > 0) {
                         getImagesLoadMore(inCompleteBusinessDataModelList.get(0).getFeatured_media());
 
                     }
 
 
-
-
-
-                } else if (response.code()==400){}else {
+                } else if (response.code() == 400) {
+                } else {
                     try {
                         businessDataModelList.remove(businessDataModelList.size() - 1);
                         businessAdapter.notifyItemRemoved(businessDataModelList.size() - 1);
@@ -719,8 +699,12 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         Log.e("error", t.getMessage());
                         if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
                             Toast.makeText(activity, R.string.something, Toast.LENGTH_SHORT).show();
-                        } else {
+                        } else if (t.getMessage().toLowerCase().equals("Socket closed".toLowerCase())){
+                            binding.progBarSearch.setVisibility(View.VISIBLE);
+                        }else
+                        {
                             Toast.makeText(activity, t.getMessage(), Toast.LENGTH_SHORT).show();
+
                         }
                     }
 
@@ -746,8 +730,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                             if (response.body().size() > 0) {
                                 spinnerLocationModelList.addAll(response.body());
-
-
 
 
                             }
@@ -805,11 +787,9 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         dialogSpinnerCategoryBinding.progBar.setVisibility(View.GONE);
                         totalPageCategory = Integer.parseInt(response.headers().get("X-WP-TotalPages"));
 
-                        if (totalPageCategory>1)
-                        {
+                        if (totalPageCategory > 1) {
                             dialogSpinnerCategoryBinding.cardMore.setVisibility(View.VISIBLE);
-                        }else
-                        {
+                        } else {
                             dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
 
                         }
@@ -932,18 +912,16 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         if (list.size() > 0) {
             int old_pos = list.size() - 1;
             if (lang.equals("ar")) {
-                if (type ==2)
-                {
+                if (type == 2) {
                     this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
                     spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
                     isLoadingCategory = false;
                 }
                 this.spinnerCategoryListingModelList.addAll(getArCategoryListing(list));
-                dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+                dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size() - 1), 100);
             } else {
 
-                if (type ==2)
-                {
+                if (type == 2) {
                     this.spinnerCategoryListingModelList.remove(this.spinnerCategoryListingModelList.size() - 1);
                     spinnerCategoryAdapter.notifyItemRemoved(this.spinnerCategoryListingModelList.size() - 1);
                     isLoadingCategory = false;
@@ -966,16 +944,11 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
-    public void updateSpinnersSelectedData(String query,int category_id,int location_id)
-    {
-        this.query =query;
+    public void updateSpinnersSelectedData(String query, int category_id, int location_id) {
+        this.query = query;
         this.cat_id = category_id;
-        this.location_id=location_id;
+        this.location_id = location_id;
         binding.edtKeyword.setText(query);
-
-
-
 
 
     }
@@ -988,6 +961,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 binding.edtKeyword.setError(getString(R.string.field_req));
             } else {
                 binding.edtKeyword.setError(null);
+                search(query, cat_id, location_id);
+
             }
         } else {
 
@@ -1001,23 +976,38 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
 
     private void search(String query, int cat_id, int location_id) {
+        Log.e("query",query+"__");
+        Log.e("cat_id",cat_id+"__");
+        Log.e("loc_id",location_id+"__");
+
+        if (clusterManager!=null)
+        {
+            clusterManager.clearItems();
+            locationList.clear();
+            clusterManager.cluster();
+        }
+
+        if (mMap!=null)
+        {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(20.687852357971384, 56.02986674755812), 7.1496434f));
+
+        }
+
+
         searchType = 1;
         index = 0;
-        if (call!=null)
-        {
+
+        if (call != null) {
             call.cancel();
         }
-        if (callLoadMore!=null)
-        {
+        if (callLoadMore != null) {
             callLoadMore.cancel();
         }
-        if (callMedia!=null)
-        {
+        if (callMedia != null) {
             callMedia.cancel();
         }
 
-        if (callLoadMoreMedia!=null)
-        {
+        if (callLoadMoreMedia != null) {
             callLoadMoreMedia.cancel();
         }
 
@@ -1029,31 +1019,30 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         binding.tvNoData2.setVisibility(View.GONE);
 
 
-        String q =null;
-        String loc_id=null;
-        String category_id=null;
-
-        if (!query.isEmpty())
-        {
+        String q = null;
+        String loc_id = null;
+        String category_id = null;
+        Map<String,String> map = new HashMap<>();
+        if (!query.isEmpty()) {
             q = query;
-
+            map.put("search",q);
         }
 
-        if (location_id!=0)
-        {
+        if (location_id != 0) {
             loc_id = String.valueOf(location_id);
+            map.put("locations",loc_id);
 
         }
 
-        if (cat_id!=0)
-        {
+        if (cat_id != 0) {
             category_id = String.valueOf(cat_id);
+            map.put("listing_categories",category_id);
+
 
         }
 
 
-
-        searchCall = Api.getService(Tags.base_url1).search(lang, 1,category_id,loc_id,q);
+        searchCall = Api.getService(Tags.base_url1).search(lang, 1,map);
         searchCall.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
             public void onResponse(Call<List<BusinessDataModel>> call, Response<List<BusinessDataModel>> response) {
@@ -1129,30 +1118,31 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private void loadMoreSearch(String query, int page, int cat_id, int location_id) {
         index = 0;
 
-        String q =null;
-        String loc_id=null;
-        String category_id=null;
+        String q = null;
+        String loc_id = null;
+        String category_id = null;
 
-        if (!query.isEmpty())
-        {
+        Map<String,String> map = new HashMap<>();
+        if (!query.isEmpty()) {
             q = query;
-
+            map.put("search",q);
         }
 
-        if (location_id!=0)
-        {
+        if (location_id != 0) {
             loc_id = String.valueOf(location_id);
+            map.put("locations",loc_id);
 
         }
 
-        if (cat_id!=0)
-        {
+        if (cat_id != 0) {
             category_id = String.valueOf(cat_id);
+            map.put("listing_categories",category_id);
+
 
         }
 
+        searchLoadMoreCall = Api.getService(Tags.base_url1).search(lang, page,map);
 
-        searchLoadMoreCall = Api.getService(Tags.base_url1).search(lang, page, category_id, loc_id, q);
 
         searchLoadMoreCall.enqueue(new Callback<List<BusinessDataModel>>() {
             @Override
@@ -1163,14 +1153,12 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
                     inCompleteBusinessDataModelList.addAll(response.body());
 
-                    if(inCompleteBusinessDataModelList.size()>0)
-                    {
+                    if (inCompleteBusinessDataModelList.size() > 0) {
                         getImagesLoadMore(inCompleteBusinessDataModelList.get(0).getFeatured_media());
 
                     }
 
-                }else if (response.code()==400)
-                {
+                } else if (response.code() == 400) {
                     businessDataModelList.remove(businessDataModelList.size() - 1);
                     businessAdapter.notifyItemRemoved(businessDataModelList.size() - 1);
                     isLoading = false;
@@ -1237,16 +1225,13 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     private List<SpinnerModel> getEnCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
 
-        for (int i = ((list.size() / 2) + 1); i < list.size(); i++) {
+        for (int i = ((list.size() / 2)); i < list.size(); i++) {
             spinnerModelList.add(list.get(i));
 
         }
 
         return spinnerModelList;
     }
-
-
-
 
 
     private void initMap() {
@@ -1271,17 +1256,14 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setCompassEnabled(false);
             mMap.getUiSettings().setTiltGesturesEnabled(false);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31.958090,35.945808),10.0f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(20.687852357971384, 56.02986674755812), 7.1496434f));
 
-            clusterManager = new ClusterManager(activity,mMap);
+            clusterManager = new ClusterManager(activity, mMap);
             mMap.setOnCameraIdleListener(clusterManager);
             mMap.setOnMarkerClickListener(clusterManager);
             mMap.setOnInfoWindowClickListener(clusterManager);
 
-            clusterRender = new ClusterRender(activity,mMap,clusterManager);
-            /*clusterManager.addItems(locationList);
-            clusterManager.setRenderer(clusterRender);
-            clusterManager.cluster();*/
+            clusterRender = new ClusterRender(activity, mMap, clusterManager);
 
 
         }
@@ -1289,37 +1271,63 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
-
     private void addMarker() {
-        if (businessDataModelList.size()>0)
-        {
-            mMap.clear();
+
+        if (businessDataModelList.size() > 0) {
             clusterManager.clearItems();
             locationList.clear();
+            clusterManager.cluster();
 
-            for (BusinessDataModel model: businessDataModelList)
-            {
-                if (model.getCmb2().getListing_business_location()!=null)
-                {
-                    if (!model.getCmb2().getListing_business_location().getListing_map_location().getLatitude().isEmpty()&&model.getCmb2().getListing_business_location().getListing_map_location().getLongitude().isEmpty())
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (BusinessDataModel model : businessDataModelList) {
+                if (model.getCmb2().getListing_business_location() != null) {
+
+                    if (model.getCmb2().getListing_business_location().getListing_map_location() instanceof String)
                     {
-                        double lat =Double.parseDouble(model.getCmb2().getListing_business_location().getListing_map_location().getLatitude());
-                        double lng =Double.parseDouble(model.getCmb2().getListing_business_location().getListing_map_location().getLongitude());
 
-                        locationList.add(new ClusterLocation(model.getCmb2().getListing_business_location().getListing_map_location().getAddress(),new LatLng(lat,lng)));
+                    }else
+                    {
+                        Map<String,String> map = (Map<String, String>) model.getCmb2().getListing_business_location().getListing_map_location();
 
+                        String lat = map.get("latitude");
+
+                        String lng = map.get("longitude");
+
+                        String address = map.get("address");
+
+                        Log.e("lat",lat+"_");
+                        Log.e("lng",lng+"_");
+                        Log.e("address",address+"_");
+
+                        if (lat!=null&&!lat.isEmpty()&&lng!=null&&!lng.isEmpty())
+                        {
+                            double lat2 = Double.parseDouble(lat);
+                            double lng2 = Double.parseDouble(lng);
+
+                            builder.include(new LatLng(lat2,lng2));
+                            locationList.add(new ClusterLocation(address, new LatLng(lat2, lng2)));
+                        }
                     }
+
+
+
+
+
 
                 }
             }
 
-            Log.e("ffff",locationList.size()+"__");
-            if (locationList.size()>0)
-            {
+            if (locationList.size() > 0) {
                 clusterManager.addItems(locationList);
                 clusterManager.setRenderer(clusterRender);
                 clusterManager.cluster();
-            }
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(),0));
+
+            }else
+                {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(20.687852357971384, 56.02986674755812), 7.1496434f));
+
+                }
 
         }
 
@@ -1329,11 +1337,14 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     public void setItemData(BusinessDataModel model) {
 
 
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id", String.valueOf(model.getId()));
+        intent.putExtra("from", 1);
+        startActivity(intent);
     }
 
 
-    private void createCategoryDialog()
-    {
+    private void createCategoryDialog() {
 
         categoryDialog = new AlertDialog.Builder(activity)
                 .create();
@@ -1351,17 +1362,15 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 if (page <= totalPageCategory) {
                     spinnerCategoryListingModelList.add(null);
                     spinnerCategoryAdapter.notifyItemInserted(spinnerCategoryListingModelList.size() - 1);
-                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
+                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size() - 1), 100);
 
                     loadMoreCategoryListing(page);
-                }else
-                {
+                } else {
                     dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
 
                 }
             }
         });
-
 
 
         dialogSpinnerCategoryBinding.btnCancel.setOnClickListener(v -> categoryDialog.dismiss()
@@ -1374,8 +1383,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private void createLocationDialog()
-    {
+    private void createLocationDialog() {
 
         locationDialog = new AlertDialog.Builder(activity)
                 .create();
@@ -1399,28 +1407,61 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void setCategoryData(SpinnerModel spinnerModel) {
-        this.cat_id = spinnerModel.getId();
-        binding.tvSpinnerCategory.setText(spinnerModel.getName());
-        categoryDialog.dismiss();
+    public void setCategoryData(SpinnerModel spinnerModel, int adapterPosition) {
+
+        if (adapterPosition != 0) {
+
+            cat_name = spinnerModel.getName();
+            this.cat_id = spinnerModel.getId();
+            binding.tvSpinnerCategory.setText(spinnerModel.getName());
+            categoryDialog.dismiss();
+        } else {
+            cat_name = "";
+            this.cat_id = 0;
+            categoryDialog.dismiss();
+
+            binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
+
+        }
+
 
     }
 
     public void setLocationData(SpinnerModel spinnerModel, int adapterPosition) {
 
-        if (adapterPosition!=0)
-        {
-            if (adapterPosition==1)
-            {
+        if (adapterPosition != 0) {
+            if (adapterPosition == 1) {
+                if (lang.equals("ar")) {
+                    location_id = 736;
+                } else {
+                    location_id = 734;
+
+                }
+                binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(1).getName());
+
                 locationDialog.dismiss();
 
-            }else
-                {
-                    location_id = spinnerModel.getId();
-                    binding.tvSpinnerLocation.setText(spinnerModel.getName());
-                    locationDialog.dismiss();
-                }
+            } else {
+                location_id = spinnerModel.getId();
+                binding.tvSpinnerLocation.setText(spinnerModel.getName());
+                locationDialog.dismiss();
+            }
+
+        } else {
+            loc_name = "";
+            location_id = 0;
+            locationDialog.dismiss();
+
+            binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
 
         }
+    }
+
+    public void setItemDirectoryData(DirectoryDataModel.DirectoryModel directoryModel) {
+
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id",String.valueOf(directoryModel.getWeb_id()));
+        intent.putExtra("from",1);
+        startActivity(intent);
     }
 }

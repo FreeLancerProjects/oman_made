@@ -102,13 +102,15 @@
                         android:orientation="vertical">
 
                         <com.makeramen.roundedimageview.RoundedImageView
-                            settingImage="@{model.peie_img}"
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
                             app:riv_border_width="0dp"
                             app:riv_corner_radius_top_left="8dp"
                             app:riv_corner_radius_top_right="8dp"
-                            app:riv_mutate_background="true" />
+                            app:riv_mutate_background="true"
+                            settingImage="@{model.peie_img}"
+
+                            />
 
                         <TextView
                             android:layout_width="match_parent"
@@ -153,13 +155,15 @@
                         android:orientation="vertical">
 
                         <com.makeramen.roundedimageview.RoundedImageView
-                            settingImage="@{model.omani_img}"
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
                             app:riv_border_width="0dp"
                             app:riv_corner_radius_top_left="8dp"
                             app:riv_corner_radius_top_right="8dp"
-                            app:riv_mutate_background="true" />
+                            app:riv_mutate_background="true"
+                            settingImage="@{model.omani_img}"
+
+                            />
 
                         <TextView
                             android:layout_width="match_parent"

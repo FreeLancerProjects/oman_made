@@ -56,7 +56,7 @@ public class FeatureListingAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             if (fragment instanceof Fragment_Home)
             {
                 Fragment_Home fragment_home = (Fragment_Home) fragment;
-                fragment_home.setFeaturedItemData(featureModel);
+                fragment_home.setFeatureListingData(featureModel);
             }
 
         });

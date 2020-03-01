@@ -612,7 +612,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     private void setUpBottomNavigation()
     {
 
@@ -623,7 +622,7 @@ public class HomeActivity extends AppCompatActivity {
 
         ah_bottom_nav.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
         ah_bottom_nav.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.white));
-        ah_bottom_nav.setTitleTextSizeInSp(14, 12);
+        ah_bottom_nav.setTitleTextSizeInSp(12, 12);
         ah_bottom_nav.setForceTint(true);
         ah_bottom_nav.setAccentColor(ContextCompat.getColor(this, R.color.colorPrimary));
         ah_bottom_nav.setInactiveColor(ContextCompat.getColor(this, R.color.black));

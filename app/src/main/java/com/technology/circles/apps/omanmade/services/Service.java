@@ -18,6 +18,7 @@ import com.technology.circles.apps.omanmade.models.SliderModel;
 import com.technology.circles.apps.omanmade.models.SponsorsModel;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -28,6 +29,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 
 public interface Service {
 
@@ -106,9 +108,7 @@ public interface Service {
     @GET("wp-json/wp/v2/business")
     Call<List<BusinessDataModel>> search(@Query("lang") String lang,
                                          @Query("page") int page,
-                                         @Query("listing_categories") String listing_categories,
-                                         @Query("locations") String locations,
-                                         @Query("search") String search
+                                         @QueryMap() Map<String,String> map
 
     );
 
@@ -119,6 +119,16 @@ public interface Service {
     Call<List<BusinessDataModel>> getBusinessByWebId2(@Query("lang") String lang,
                                                       @Query("page") int page,
                                                       @Query("listing_categories") String listing_categories
+
+    );
+
+    @GET("wp-json/wp/v2/business/{web_id}")
+    Call<ResponseBody> getBusinessByWebIdGallery(@Path("web_id") String web_id);
+
+    @GET("wp-json/wp/v2/business")
+    Call<ResponseBody> getBusinessByWebId2Gallery(@Query("lang") String lang,
+                                                  @Query("page") int page,
+                                                  @Query("listing_categories") String listing_categories
 
     );
 

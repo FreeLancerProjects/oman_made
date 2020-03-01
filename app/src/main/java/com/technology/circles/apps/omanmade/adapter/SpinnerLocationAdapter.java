@@ -84,7 +84,7 @@ public class SpinnerLocationAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
                    if (type==1)
                    {
-                       fragment_directory.setCategoryData(spinnerModel);
+                       fragment_directory.setCategoryData(spinnerModel,myHolder.getAdapterPosition());
                    }else if (type ==2)
                    {
                        fragment_directory.setLocationData(spinnerModel,myHolder.getAdapterPosition());

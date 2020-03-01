@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -16,6 +17,7 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Home;
 import com.technology.circles.apps.omanmade.models.SliderModel;
 import com.technology.circles.apps.omanmade.tags.Tags;
 
@@ -24,10 +26,12 @@ import java.util.List;
 public class SliderAdapter extends PagerAdapter {
     private List<SliderModel.Slide> list;
     private Context context;
+    private Fragment_Home fragment_home;
 
-    public SliderAdapter(List<SliderModel.Slide> list, Context context) {
+    public SliderAdapter(List<SliderModel.Slide> list, Context context, Fragment_Home fragment_home) {
         this.list = list;
         this.context = context;
+        this.fragment_home = fragment_home;
     }
 
     @Override
@@ -40,6 +44,7 @@ public class SliderAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         View view = LayoutInflater.from(context).inflate(R.layout.silder_row,container,false);
         ImageView image = view.findViewById(R.id.image);
+        TextView tvMore = view.findViewById(R.id.tvMore);
         ProgressBar progressBar = view.findViewById(R.id.progBar);
         progressBar.getIndeterminateDrawable().setColorFilter(ContextCompat.getColor(context,R.color.colorPrimary), PorterDuff.Mode.SRC_IN);
         Uri path = Uri.parse(Tags.IMAGE_URL_SLIDER+list.get(position).getImage());
@@ -54,6 +59,14 @@ public class SliderAdapter extends PagerAdapter {
 
             }
         });
+
+        tvMore.setOnClickListener(view1 -> {
+            fragment_home.setSliderData(list.get(position));
+
+        });
+
+
+
         container.addView(view);
         return view;
 

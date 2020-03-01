@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments.Fragment_Directory;
 import com.technology.circles.apps.omanmade.databinding.DirectoryRowBinding;
 import com.technology.circles.apps.omanmade.models.DirectoryDataModel;
 
@@ -49,6 +50,14 @@ public class DirectoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         myHolder.binding.setModel(list.get(position));
 
+        myHolder.itemView.setOnClickListener(view -> {
+            if (fragment instanceof Fragment_Directory)
+            {
+                Fragment_Directory fragment_directory = (Fragment_Directory) fragment;
+                DirectoryDataModel.DirectoryModel directoryModel = list.get(myHolder.getAdapterPosition());
+                fragment_directory.setItemDirectoryData(directoryModel);
+            }
+        });
     }
 
     @Override

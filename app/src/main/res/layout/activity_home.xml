@@ -364,7 +364,7 @@
                                     android:paddingLeft="8dp"
                                     android:paddingRight="8dp"
                                     android:singleLine="true"
-                                    android:text="@string/about_app"
+                                    android:text="@string/about_us"
                                     />
 
                                 <ImageView

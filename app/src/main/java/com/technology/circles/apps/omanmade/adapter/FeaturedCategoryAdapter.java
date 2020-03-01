@@ -53,8 +53,9 @@ public class FeaturedCategoryAdapter extends RecyclerView.Adapter<RecyclerView.V
         myHolder.itemView.setOnClickListener(view -> {
             if (fragment instanceof Fragment_Home)
             {
+
                 Fragment_Home fragment_home = (Fragment_Home) fragment;
-                fragment_home.setItemData();
+                fragment_home.setItemDataFeatureCategory(list.get(myHolder.getAdapterPosition()));
             }
         });
 

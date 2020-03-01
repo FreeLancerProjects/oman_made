@@ -256,7 +256,7 @@ public class Fragment_Home extends Fragment {
 
         if (sliderModel.getSlides().size() > 0) {
             binding.flSliderContainer.setVisibility(View.VISIBLE);
-            sliderAdapter = new SliderAdapter(sliderModel.getSlides(), activity);
+            sliderAdapter = new SliderAdapter(sliderModel.getSlides(), activity,this);
             binding.pager.setAdapter(sliderAdapter);
             binding.tab.setupWithViewPager(binding.pager);
 
@@ -785,7 +785,7 @@ public class Fragment_Home extends Fragment {
     private List<SpinnerModel> getEnCategoryListing(List<SpinnerModel> list) {
         List<SpinnerModel> spinnerModelList = new ArrayList<>();
 
-        for (int i = ((list.size() / 2) + 1); i < list.size(); i++) {
+        for (int i = ((list.size() / 2)); i < list.size(); i++) {
             spinnerModelList.add(list.get(i));
 
         }
@@ -861,10 +861,6 @@ public class Fragment_Home extends Fragment {
     }
 
 
-    public void setItemData() {
-
-        activity.DisplayFragmentDirectory(0, "", 0, 0,cat_name,loc_name);
-    }
 
     public void setCategoryData(SpinnerModel spinnerModel, int adapterPosition) {
         if (adapterPosition!=0)
@@ -874,7 +870,15 @@ public class Fragment_Home extends Fragment {
             this.category_id = spinnerModel.getId();
             binding.tvSpinnerCategory.setText(spinnerModel.getName());
             categoryDialog.dismiss();
-        }
+        }else
+            {
+                cat_name = "";
+                this.category_id =0;
+                categoryDialog.dismiss();
+
+                binding.tvSpinnerCategory.setText(spinnerCategoryListingModelList.get(0).getName());
+
+            }
 
 
     }
@@ -886,6 +890,18 @@ public class Fragment_Home extends Fragment {
         {
             if (adapterPosition==1)
             {
+                if (lang.equals("ar"))
+                {
+                    location_id = 736;
+                }else
+                    {
+                        location_id = 734;
+
+                    }
+                loc_name = spinnerLocationModelList.get(1).getName();
+
+                binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(1).getName());
+
                 locationDialog.dismiss();
 
             }else
@@ -896,17 +912,53 @@ public class Fragment_Home extends Fragment {
                 locationDialog.dismiss();
             }
 
-        }
+        }else
+            {
+                loc_name = "";
+                location_id = 0;
+                locationDialog.dismiss();
+
+                binding.tvSpinnerLocation.setText(spinnerLocationModelList.get(0).getName());
+
+            }
     }
 
-    public void setFeaturedItemData(FeatureListingDataModel.FeatureModel featureModel) {
+
+    public void setSliderData(SliderModel.Slide slide) {
 
         Intent intent = new Intent(activity, BusinessDetailsActivity.class);
-
-        intent.putExtra("web_id",String.valueOf(32010));
+        intent.putExtra("web_id",String.valueOf(slide.getWeb_id()));
         intent.putExtra("from",1);
         startActivity(intent);
+    }
 
+    public void setFeatureListingData(FeatureListingDataModel.FeatureModel featureModel) {
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id",String.valueOf(featureModel.getWeb_id()));
+        intent.putExtra("from",1);
+        startActivity(intent);
+    }
+
+    public void setItemDataFeatureCategory(FeaturedCategoryDataModel.FeaturedCategoryModel featuredCategoryModel) {
+
+        Log.e("web_id",featuredCategoryModel.getWeb_id()+"_");
+        activity.DisplayFragmentDirectory(1, "", Integer.parseInt(featuredCategoryModel.getWeb_id()), 0,"","");
+
+       /* Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id",String.valueOf(featuredCategoryModel.getWeb_id()));
+        intent.putExtra("from",2);
+        startActivity(intent);*/
+    }
+
+    public void setItemDataIndustrialArea(IndustrialAreaDataModel.IndustrialAreaModel industrialAreaModel) {
+
+        activity.DisplayFragmentDirectory(1, "", Integer.parseInt(industrialAreaModel.getWeb_id()), 0,"","");
+
+
+       /* Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id",String.valueOf(industrialAreaModel.getWeb_id()));
+        intent.putExtra("from",2);
+        startActivity(intent);*/
     }
 
 

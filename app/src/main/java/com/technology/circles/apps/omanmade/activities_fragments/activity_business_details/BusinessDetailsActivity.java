@@ -20,8 +20,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 import com.technology.circles.apps.omanmade.R;
 import com.technology.circles.apps.omanmade.activities_fragments.FragmentMapTouchListener;
+import com.technology.circles.apps.omanmade.adapter.Gallery1Adapter;
 import com.technology.circles.apps.omanmade.adapter.OpenHourAdapter;
 import com.technology.circles.apps.omanmade.databinding.ActivityBusinessDetailsBinding;
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
@@ -30,12 +32,19 @@ import com.technology.circles.apps.omanmade.models.BusinessDataModel;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.tags.Tags;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.paperdb.Paper;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,6 +58,11 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
     private int from;
     private OpenHourAdapter openHourAdapter;
     private List<BusinessDataModel.OpeningHourList> openingHourLists;
+    private List<String> gallery;
+    private Gallery1Adapter galleryAdapter;
+    private Timer timer;
+    private TimerTask timerTask;
+    private boolean isPlaying = false;
 
 
     @Override
@@ -70,12 +84,15 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
         Intent intent = getIntent();
         if (intent!=null)
         {
-            web_id = intent.getStringExtra("web_id");
             from = intent.getIntExtra("from",1);
+            web_id = intent.getStringExtra("web_id");
+
+            Log.e("wid",web_id);
 
         }
     }
     private void initView() {
+        gallery = new ArrayList<>();
         openingHourLists = new ArrayList<>();
 
         Paper.init(this);
@@ -90,11 +107,55 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
         if (from==1)
         {
             getBusinessData_Slider_FeatureListing();
+
+            getBusinessData_Slider_FeatureListingGallery();
         }else if (from==2)
         {
             getBusinessData_FeaturedCategory_IndustrialArea();
+            getBusinessData_FeaturedCategory_IndustrialAreaGallery();
+
         }
+
+        binding.imageBack.setOnClickListener(view -> {
+
+            if (gallery.size()>1)
+            {
+                binding.pager.setCurrentItem(binding.pager.getRealItem()-1);
+            }
+
+        });
+
+        binding.imageForward.setOnClickListener(view -> {
+
+            if (gallery.size()>1)
+            {
+                binding.pager.setCurrentItem(binding.pager.getRealItem()+1);
+            }
+
+        });
+
+        binding.imagePlayPause.setOnClickListener(view -> {
+
+            if (gallery.size()>1)
+            {
+                if (isPlaying)
+                {
+                    stopTimer();
+                }else
+                    {
+                        startTimer();
+                    }
+            }
+
+        });
+
+        binding.recViewOpeningHours.setNestedScrollingEnabled(true);
+
+        binding.scrollView.getParent().requestChildFocus(binding.scrollView,binding.scrollView);
     }
+
+
+
 
     private void initMap() {
 
@@ -120,7 +181,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
             mMap.getUiSettings().setMapToolbarEnabled(false);
             mMap.getUiSettings().setCompassEnabled(false);
             mMap.getUiSettings().setTiltGesturesEnabled(false);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31.958090,35.945808),10.0f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(20.687852357971384,56.02986674755812), 7.1496434f));
 
             fragment.setListener(() -> binding.scrollView.requestDisallowInterceptTouchEvent(true));
 
@@ -138,6 +199,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
 
     private void getBusinessData_Slider_FeatureListing()
     {
+
         Api.getService(Tags.base_url1).
                 getBusinessByWebId(web_id).
                 enqueue(new Callback<BusinessDataModel>() {
@@ -146,6 +208,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                         binding.progBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
                             binding.tvNoData.setVisibility(View.GONE);
+                            Log.e("ttt","ttt");
                             updateUI(response.body());
 
                         } else {
@@ -194,25 +257,45 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                 });
     }
 
-    private void updateUI(BusinessDataModel businessDataModel) {
+    private void updateUI(BusinessDataModel businessDataModel)
+    {
 
         binding.setModel(businessDataModel);
         binding.llContainer.setVisibility(View.VISIBLE);
 
-        String lat = businessDataModel.getCmb2().getListing_business_location().getListing_map_location().getLatitude();
-        String lng = businessDataModel.getCmb2().getListing_business_location().getListing_map_location().getLatitude();
-        String address = businessDataModel.getCmb2().getListing_business_location().getListing_map_location().getAddress();
-        if (lat!=null&&!lat.isEmpty()&&lng!=null&&!lng.isEmpty())
+        if (businessDataModel.getCmb2().getListing_business_location().getListing_map_location() instanceof String)
         {
-            addMarker(Double.parseDouble(lat),Double.parseDouble(lng),address);
-        }
+            binding.llMap.setVisibility(View.GONE);
+
+        }else
+            {
+                Map<String,String> map = (Map<String, String>) businessDataModel.getCmb2().getListing_business_location().getListing_map_location();
+
+                String lat = map.get("latitude");
+
+                String lng = map.get("longitude");
+
+                String address = map.get("address");
+
+                binding.tvAddress.setText(address);
+                if (lat!=null&&!lat.isEmpty()&&lng!=null&&!lng.isEmpty())
+                {
+                    addMarker(Double.parseDouble(lat),Double.parseDouble(lng),address);
+                }else
+                    {
+                        binding.llMap.setVisibility(View.GONE);
+                    }
+            }
 
 
-        if (businessDataModel.getCmb2().getListing_business_opening_hours().getListing_opening_hours() instanceof String) {
+
+
+        if (businessDataModel.getCmb2().getListing_business_opening_hours().getListing_opening_hours() instanceof String)
+        {
             binding.tvNotAvailable.setVisibility(View.VISIBLE);
         } else if (businessDataModel.getCmb2().getListing_business_opening_hours().getListing_opening_hours() instanceof  List) {
 
-            List< Map<String,String>> objectList = (List<Map<String, String>>) businessDataModel.getCmb2().getListing_business_opening_hours().getListing_opening_hours();
+            List<Map<String,String>> objectList = (List<Map<String, String>>) businessDataModel.getCmb2().getListing_business_opening_hours().getListing_opening_hours();
 
             for (Map<String,String> map :objectList)
             {
@@ -231,7 +314,12 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
             binding.recViewOpeningHours.setLayoutManager(new LinearLayoutManager(this));
             binding.recViewOpeningHours.setAdapter(openHourAdapter);
             binding.tvNotAvailable.setVisibility(View.GONE);
+
+
+
+
         }
+
 
 
 
@@ -250,9 +338,10 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                     if (response.body().size()>0)
                     {
 
+                        updateUI(response.body().get(0));
                     }else
                         {
-                            binding.tvNoData.setVisibility(View.GONE);
+                            binding.tvNoData.setVisibility(View.VISIBLE);
 
                         }
 
@@ -300,6 +389,248 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
             }
         });
 
+    }
+
+    private void getBusinessData_Slider_FeatureListingGallery()
+    {
+
+        Api.getService(Tags.base_url1).
+                getBusinessByWebIdGallery(web_id).
+                enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().string());
+                                JSONObject cmb2 = jsonObject.getJSONObject("cmb2");
+                                JSONObject listing_business_gallery = cmb2.getJSONObject("listing_business_gallery");
+                                JSONObject listing_gallery = listing_business_gallery.getJSONObject("listing_gallery");
+
+                                Map<String,String> map = new Gson().fromJson(listing_gallery.toString(), HashMap.class);
+
+                                for (String key :map.keySet())
+                                {
+                                    gallery.add(map.get(key));
+                                }
+
+                                updateGalleryUI();
+
+
+                            } catch (JSONException e) {
+                                Log.e("dddd",e.getMessage()+"_");
+                                binding.pager.setVisibility(View.GONE);
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(BusinessDetailsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else if (response.code()==404){
+
+                                binding.tvNoData.setVisibility(View.VISIBLE);
+                            }else {
+                                Toast.makeText(BusinessDetailsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        try {
+
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(BusinessDetailsActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(BusinessDetailsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+
+    }
+
+    private void getBusinessData_FeaturedCategory_IndustrialAreaGallery()
+    {
+
+        Api.getService(Tags.base_url1).
+                getBusinessByWebId2Gallery(lang,1,web_id).
+                enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+
+                            try {
+                                JSONObject jsonObject = new JSONObject(response.body().string());
+                                JSONObject cmb2 = jsonObject.getJSONObject("cmb2");
+                                JSONObject listing_business_gallery = cmb2.getJSONObject("listing_business_gallery");
+                                JSONObject listing_gallery = listing_business_gallery.getJSONObject("listing_gallery");
+
+                                Map<String,String> map = new Gson().fromJson(listing_gallery.toString(), HashMap.class);
+
+                                for (String key :map.keySet())
+                                {
+                                    gallery.add(map.get(key));
+                                }
+
+                                updateGalleryUI();
+
+
+                            } catch (JSONException e) {
+                                Log.e("dddd",e.getMessage()+"_");
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+
+                                Log.e("error", response.code() + "_" + response.errorBody().string());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (response.code() == 500) {
+                                Toast.makeText(BusinessDetailsActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+
+
+                            } else if (response.code()==404){
+
+                                binding.tvNoData.setVisibility(View.VISIBLE);
+                            }else {
+                                Toast.makeText(BusinessDetailsActivity.this, getString(R.string.failed), Toast.LENGTH_SHORT).show();
+
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        try {
+
+                            if (t.getMessage() != null) {
+                                Log.e("error", t.getMessage());
+                                if (t.getMessage().toLowerCase().contains("failed to connect") || t.getMessage().toLowerCase().contains("unable to resolve host")) {
+                                    Toast.makeText(BusinessDetailsActivity.this, R.string.something, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(BusinessDetailsActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        } catch (Exception e) {
+                        }
+
+
+
+                    }
+                });
+    }
+
+    private void updateGalleryUI()
+    {
+
+        if (gallery.size()>0)
+        {
+            binding.pager.setVisibility(View.VISIBLE);
+
+            galleryAdapter = new Gallery1Adapter(gallery,this);
+            binding.pager.setAdapter(galleryAdapter);
+
+
+            if (gallery.size()>1)
+            {
+                binding.llPlay.setVisibility(View.VISIBLE);
+                startTimer();
+            }
+        }else
+            {
+                binding.pager.setVisibility(View.GONE);
+            }
+
+    }
+
+    private void startTimer() {
+
+        isPlaying = true;
+        binding.imagePlayPause.setImageResource(R.drawable.ic_pause);
+        timer = new Timer();
+        timerTask = new MyTimerTask();
+        timer.scheduleAtFixedRate(timerTask, 6000, 6000);
+    }
+
+    private void stopTimer() {
+        isPlaying = false;
+        binding.imagePlayPause.setImageResource(R.drawable.ic_play);
+
+        if (timer != null) {
+
+            timer.cancel();
+            timer.purge();
+
+        }
+
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+    }
+
+
+    private class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(() -> {
+                binding.pager.setCurrentItem(binding.pager.getRealItem() + 1);
+
+            });
+        }
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        stopTimer();
+
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopTimer();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (gallery.size()>1)
+        {
+            startTimer();
+        }
     }
 
     @Override

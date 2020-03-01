@@ -89,5 +89,7 @@
     <string name="location">الموقع</string>
     <string name="slogan">الشعار</string>
     <string name="location_on_map">الموقع على الخريطة</string>
+    <string name="about_us">عن التطبيق</string>
+    <string name="more2">المزيد من المعلومات</string>
 
 </resources>

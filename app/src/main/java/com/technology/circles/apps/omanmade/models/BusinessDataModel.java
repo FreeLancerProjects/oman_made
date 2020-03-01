@@ -1,7 +1,6 @@
 package com.technology.circles.apps.omanmade.models;
 
 import java.io.Serializable;
-import java.util.Map;
 
 public class BusinessDataModel implements Serializable {
     private int id;
@@ -72,15 +71,12 @@ public class BusinessDataModel implements Serializable {
 
         private Listing_Business_Branding listing_business_branding;
 
-        private Listing_Gallery listing_gallery;
 
         public Listing_Business_General getListing_business_general() {
             return listing_business_general;
         }
 
-        public Listing_Gallery getListing_gallery() {
-            return listing_gallery;
-        }
+
 
         public Opening_Hour getListing_business_opening_hours() {
             return listing_business_opening_hours;
@@ -253,12 +249,12 @@ public class BusinessDataModel implements Serializable {
     public static class Listing_Business_Location implements Serializable
     {
         private Object listing_locations;
-        private Listing_Map_Location listing_map_location;
+        private Object listing_map_location;
         public Object getListing_locations() {
             return listing_locations;
         }
 
-        public Listing_Map_Location getListing_map_location() {
+        public Object getListing_map_location() {
             return listing_map_location;
         }
     }
@@ -319,12 +315,5 @@ public class BusinessDataModel implements Serializable {
             return listing_logo;
         }
     }
-    public static class Listing_Gallery implements Serializable
-    {
-        private Map<String,String> map;
 
-        public Map<String, String> getMap() {
-            return map;
-        }
-    }
 }

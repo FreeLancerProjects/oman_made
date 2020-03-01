@@ -53,7 +53,7 @@ public class IndustrialAreaAdapter2 extends RecyclerView.Adapter<RecyclerView.Vi
             if (fragment instanceof Fragment_Industry)
             {
                 Fragment_Industry fragment_industry = (Fragment_Industry) fragment;
-                fragment_industry.setItemData();
+                fragment_industry.setItemDataIndustrialArea(list.get(myHolder.getAdapterPosition()));
             }
         });
     }

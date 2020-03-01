@@ -64,6 +64,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.12.1'
     implementation 'com.github.FlyingPumba:SimpleRatingBar:v0.1.5'
     implementation 'rouchuan.viewpagerlayoutmanager:viewpagerlayoutmanager:2.0.22'
+    implementation 'com.github.devlight:infinitecycleviewpager:1.0.2'
 
 
 }

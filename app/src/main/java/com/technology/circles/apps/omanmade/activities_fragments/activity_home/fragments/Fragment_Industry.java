@@ -1,5 +1,6 @@
 package com.technology.circles.apps.omanmade.activities_fragments.activity_home.fragments;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.technology.circles.apps.omanmade.R;
+import com.technology.circles.apps.omanmade.activities_fragments.activity_business_details.BusinessDetailsActivity;
 import com.technology.circles.apps.omanmade.activities_fragments.activity_home.HomeActivity;
 import com.technology.circles.apps.omanmade.adapter.IndustrialAreaAdapter2;
 import com.technology.circles.apps.omanmade.databinding.FragmentIndustryBinding;
@@ -136,8 +138,15 @@ public class Fragment_Industry extends Fragment {
     }
 
 
-    public void setItemData() {
 
-        activity.DisplayFragmentDirectory(0,"",0,0,"","");
+
+    public void setItemDataIndustrialArea(IndustrialAreaDataModel.IndustrialAreaModel industrialAreaModel) {
+
+        //activity.DisplayFragmentDirectory(0,"",0,0,"","");
+
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id",String.valueOf(industrialAreaModel.getWeb_id()));
+        intent.putExtra("from",2);
+        startActivity(intent);
     }
 }

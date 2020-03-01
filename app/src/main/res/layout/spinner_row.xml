@@ -1,21 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
             name="name"
             type="String" />
     </data>
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="@color/black"
-        android:textSize="13sp"
-        android:gravity="start"
-        android:minHeight="50dp"
-        android:text="@{name}"
-        android:singleLine="true"
-        />
+        >
+        <TextView
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:minHeight="50dp"
+            android:text="@{name}"
+            android:singleLine="true"
+            android:clickable="false"
+            android:longClickable="false"
+
+            />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>
