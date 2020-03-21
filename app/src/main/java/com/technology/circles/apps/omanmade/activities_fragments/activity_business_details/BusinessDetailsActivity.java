@@ -29,6 +29,7 @@ import com.technology.circles.apps.omanmade.databinding.ActivityBusinessDetailsB
 import com.technology.circles.apps.omanmade.interfaces.Listeners;
 import com.technology.circles.apps.omanmade.language.LanguageHelper;
 import com.technology.circles.apps.omanmade.models.BusinessDataModel;
+import com.technology.circles.apps.omanmade.models.MapLocationModel;
 import com.technology.circles.apps.omanmade.remote.Api;
 import com.technology.circles.apps.omanmade.tags.Tags;
 
@@ -55,7 +56,6 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
     private FragmentMapTouchListener fragment;
     private GoogleMap mMap;
     private String web_id;
-    private int from;
     private OpenHourAdapter openHourAdapter;
     private List<BusinessDataModel.OpeningHourList> openingHourLists;
     private List<String> gallery;
@@ -63,7 +63,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
     private Timer timer;
     private TimerTask timerTask;
     private boolean isPlaying = false;
-
+    private MapLocationModel mapLocationModel=null;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -84,7 +84,10 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
         Intent intent = getIntent();
         if (intent!=null)
         {
-            from = intent.getIntExtra("from",1);
+            if (intent.hasExtra("data"))
+            {
+                mapLocationModel = (MapLocationModel) intent.getSerializableExtra("data");
+            }
             web_id = intent.getStringExtra("web_id");
 
             Log.e("wid",web_id);
@@ -104,17 +107,10 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
 
         initMap();
 
-        if (from==1)
-        {
-            getBusinessData_Slider_FeatureListing();
 
-            getBusinessData_Slider_FeatureListingGallery();
-        }else if (from==2)
-        {
-            getBusinessData_FeaturedCategory_IndustrialArea();
-            getBusinessData_FeaturedCategory_IndustrialAreaGallery();
+        getBusinessData();
 
-        }
+        getBusinessData_Slider_FeatureListingGallery();
 
         binding.imageBack.setOnClickListener(view -> {
 
@@ -197,7 +193,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lng),13.5f));
     }
 
-    private void getBusinessData_Slider_FeatureListing()
+    private void getBusinessData()
     {
 
         Api.getService(Tags.base_url1).
@@ -208,7 +204,6 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                         binding.progBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null) {
                             binding.tvNoData.setVisibility(View.GONE);
-                            Log.e("ttt","ttt");
                             updateUI(response.body());
 
                         } else {
@@ -260,6 +255,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
     private void updateUI(BusinessDataModel businessDataModel)
     {
 
+
         binding.setModel(businessDataModel);
         binding.llContainer.setVisibility(View.VISIBLE);
 
@@ -269,6 +265,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
 
         }else
             {
+
                 Map<String,String> map = (Map<String, String>) businessDataModel.getCmb2().getListing_business_location().getListing_map_location();
 
                 String lat = map.get("latitude");
@@ -281,9 +278,23 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                 if (lat!=null&&!lat.isEmpty()&&lng!=null&&!lng.isEmpty())
                 {
                     addMarker(Double.parseDouble(lat),Double.parseDouble(lng),address);
+                    binding.llMap.setVisibility(View.VISIBLE);
+
                 }else
                     {
-                        binding.llMap.setVisibility(View.GONE);
+                        if (mapLocationModel!=null&&!mapLocationModel.getLatitude().isEmpty()&&mapLocationModel.getLatitude()!=null)
+                        {
+
+                            binding.llMap.setVisibility(View.VISIBLE);
+                            addMarker(Double.parseDouble(mapLocationModel.getLatitude()),Double.parseDouble(mapLocationModel.getLongitude()),mapLocationModel.getAddress());
+
+                        }else
+                            {
+                                binding.llMap.setVisibility(View.GONE);
+
+                            }
+
+
                     }
             }
 
@@ -393,7 +404,7 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
 
     private void getBusinessData_Slider_FeatureListingGallery()
     {
-
+        Log.e("wid",web_id+"__");
         Api.getService(Tags.base_url1).
                 getBusinessByWebIdGallery(web_id).
                 enqueue(new Callback<ResponseBody>() {
@@ -401,11 +412,15 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (response.isSuccessful() && response.body() != null) {
 
+
                             try {
                                 JSONObject jsonObject = new JSONObject(response.body().string());
                                 JSONObject cmb2 = jsonObject.getJSONObject("cmb2");
                                 JSONObject listing_business_gallery = cmb2.getJSONObject("listing_business_gallery");
                                 JSONObject listing_gallery = listing_business_gallery.getJSONObject("listing_gallery");
+
+
+
 
                                 Map<String,String> map = new Gson().fromJson(listing_gallery.toString(), HashMap.class);
 
@@ -415,6 +430,10 @@ public class BusinessDetailsActivity extends AppCompatActivity implements Listen
                                 }
 
                                 updateGalleryUI();
+
+
+
+
 
 
                             } catch (JSONException e) {

@@ -38,6 +38,7 @@ import com.technology.circles.apps.omanmade.models.BusinessDataModel;
 import com.technology.circles.apps.omanmade.models.ClusterLocation;
 import com.technology.circles.apps.omanmade.models.ClusterRender;
 import com.technology.circles.apps.omanmade.models.DirectoryDataModel;
+import com.technology.circles.apps.omanmade.models.MapLocationModel;
 import com.technology.circles.apps.omanmade.models.MediaModel;
 import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.preferences.Preferences;
@@ -791,8 +792,19 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
     private void getCategoryListing() {
 
+        int parent;
+
+        if (lang.equals("ar"))
+        {
+            parent = 4921;
+        }else
+            {
+                parent = 4923;
+
+            }
+
         Api.getService(Tags.base_url1).
-                getListingCategory(1).
+                getListingCategory(1,parent).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
@@ -808,7 +820,11 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                         if (response.isSuccessful() && response.body() != null) {
 
                             if (response.body().size() > 0) {
-                                updateSpinnerCategoryListing(response.body(), 1);
+
+                                spinnerCategoryListingModelList.addAll(response.body());
+                                spinnerCategoryAdapter.notifyDataSetChanged();
+
+                                //updateSpinnerCategoryListing(response.body(), 1);
                             } else {
                                 dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
@@ -855,18 +871,40 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
     private void loadMoreCategoryListing(int page) {
+
+        int parent;
+
+        if (lang.equals("ar"))
+        {
+            parent = 4921;
+        }else
+        {
+            parent = 4923;
+
+        }
+
         Api.getService(Tags.base_url1).
-                getListingCategory(page).
+                getListingCategory(page,parent).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        int old_pos = spinnerCategoryListingModelList.size() - 1;
 
                         if (response.isSuccessful() && response.body() != null) {
 
 
                             if (response.body().size() > 0) {
                                 currentPageCategory = page;
-                                updateSpinnerCategoryListing(response.body(), 2);
+
+                                spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                                spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                                isLoadingCategory = false;
+
+                                spinnerCategoryListingModelList.addAll(getArCategoryListing(response.body()));
+                                spinnerCategoryAdapter.notifyItemRangeChanged(old_pos, spinnerCategoryListingModelList.size());
+
+                                //updateSpinnerCategoryListing(response.body(), 2);
                             } else {
                                 dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
@@ -992,6 +1030,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         Log.e("cat_id",cat_id+"__");
         Log.e("loc_id",location_id+"__");
 
+        activity.setSearchData(cat_id,location_id,cat_name,loc_name,query);
         if (clusterManager!=null)
         {
             clusterManager.clearItems();
@@ -1346,14 +1385,6 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
     }
 
 
-    public void setItemData(BusinessDataModel model) {
-
-
-        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
-        intent.putExtra("web_id", String.valueOf(model.getId()));
-        intent.putExtra("from", 1);
-        startActivity(intent);
-    }
 
 
     private void createCategoryDialog() {
@@ -1374,8 +1405,8 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 if (page <= totalPageCategory) {
                     spinnerCategoryListingModelList.add(null);
                     spinnerCategoryAdapter.notifyItemInserted(spinnerCategoryListingModelList.size() - 1);
-                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size() - 1), 100);
-
+                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size() - 1), 500);
+                    isLoadingCategory = true;
                     loadMoreCategoryListing(page);
                 } else {
                     dialogSpinnerCategoryBinding.cardMore.setVisibility(View.GONE);
@@ -1441,6 +1472,7 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
 
     public void setLocationData(SpinnerModel spinnerModel, int adapterPosition) {
 
+
         if (adapterPosition != 0) {
             if (adapterPosition == 1) {
                 if (lang.equals("ar")) {
@@ -1454,9 +1486,14 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
                 locationDialog.dismiss();
 
             } else {
+
+
                 location_id = spinnerModel.getId();
+                loc_name = spinnerModel.getName();
                 binding.tvSpinnerLocation.setText(spinnerModel.getName());
                 locationDialog.dismiss();
+
+                Log.e("id",location_id+"_");
             }
 
         } else {
@@ -1469,11 +1506,49 @@ public class Fragment_Directory extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void setItemDirectoryData(DirectoryDataModel.DirectoryModel directoryModel) {
+    public void setItemData(BusinessDataModel model) {
 
         Intent intent = new Intent(activity, BusinessDetailsActivity.class);
+        intent.putExtra("web_id", String.valueOf(model.getId()));
+
+        if (model.getCmb2().getListing_business_location().getListing_map_location() instanceof String)
+        {
+
+        }else
+        {
+            Map<String,String> map = (Map<String, String>) model.getCmb2().getListing_business_location().getListing_map_location();
+
+            String lat = map.get("latitude");
+
+            String lng = map.get("longitude");
+
+            String address = map.get("address");
+
+            Log.e("lat",lat+"_");
+            Log.e("lng",lng+"_");
+            Log.e("address",address+"_");
+
+            if (lat!=null&&!lat.isEmpty()&&lng!=null&&!lng.isEmpty())
+            {
+                MapLocationModel mapLocationModel = new MapLocationModel(address,lat,lng);
+                intent.putExtra("data",mapLocationModel);
+            }
+        }
+
+
+
+        startActivity(intent);
+    }
+
+    public void setItemDirectoryData(DirectoryDataModel.DirectoryModel directoryModel) {
+
+
+
+
+        Log.e("web_id",directoryModel.getWeb_id()+"_");
+        Intent intent = new Intent(activity, BusinessDetailsActivity.class);
         intent.putExtra("web_id",String.valueOf(directoryModel.getWeb_id()));
-        intent.putExtra("from",1);
+
         startActivity(intent);
     }
 }

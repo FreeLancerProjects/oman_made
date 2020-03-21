@@ -32,7 +32,17 @@ public class ClusterRender extends DefaultClusterRenderer<ClusterLocation> {
         iconGenerator.setBackground(ContextCompat.getDrawable(context, R.drawable.cluster_item_bg));
         iconGenerator.setContentPadding(10,3,10,3);
         iconGenerator.setTextAppearance(R.style.iconGenText);
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon(item.getTitle())));
+        String title ;
+
+        if (item.getTitle().length()>=8)
+        {
+            title = item.getTitle().substring(0,8)+"...";
+        }else
+            {
+                title = item.getTitle();
+            }
+
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon(title)));
 
     }
 

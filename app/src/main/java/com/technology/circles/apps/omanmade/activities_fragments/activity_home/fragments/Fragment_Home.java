@@ -601,8 +601,19 @@ public class Fragment_Home extends Fragment {
 
     private void getCategoryListing() {
 
+        int parent;
+
+        if (lang.equals("ar"))
+        {
+            parent = 4921;
+        }else
+        {
+            parent = 4923;
+
+        }
+
         Api.getService(Tags.base_url1).
-                getListingCategory(1).
+                getListingCategory(1,parent).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
@@ -620,7 +631,10 @@ public class Fragment_Home extends Fragment {
                         if (response.isSuccessful() && response.body() != null) {
 
                             if (response.body().size() > 0) {
-                                updateSpinnerCategoryListing(response.body(), 1);
+
+                                spinnerCategoryListingModelList.addAll(response.body());
+                                spinnerCategoryAdapter.notifyDataSetChanged();
+                                //updateSpinnerCategoryListing(response.body(), 1);
                             } else {
                                 dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
@@ -667,18 +681,38 @@ public class Fragment_Home extends Fragment {
     }
 
     private void loadMoreCategoryListing(int page) {
+        int parent;
+
+        if (lang.equals("ar"))
+        {
+            parent = 4921;
+        }else
+        {
+            parent = 4923;
+
+        }
         Api.getService(Tags.base_url1).
-                getListingCategory(page).
+                getListingCategory(page,parent).
                 enqueue(new Callback<List<SpinnerModel>>() {
                     @Override
                     public void onResponse(Call<List<SpinnerModel>> call, Response<List<SpinnerModel>> response) {
+
+                        int old_pos = spinnerCategoryListingModelList.size() - 1;
 
                         if (response.isSuccessful() && response.body() != null) {
 
 
                             if (response.body().size() > 0) {
                                 currentPageCategory = page;
-                                updateSpinnerCategoryListing(response.body(), 2);
+
+                                spinnerCategoryListingModelList.remove(spinnerCategoryListingModelList.size() - 1);
+                                spinnerCategoryAdapter.notifyItemRemoved(spinnerCategoryListingModelList.size() - 1);
+                                isLoadingCategory = false;
+
+                                spinnerCategoryListingModelList.addAll(getArCategoryListing(response.body()));
+                                spinnerCategoryAdapter.notifyItemRangeChanged(old_pos, spinnerCategoryListingModelList.size());
+
+                                //updateSpinnerCategoryListing(response.body(), 2);
                             } else {
                                 dialogSpinnerCategoryBinding.tvNoData.setVisibility(View.VISIBLE);
                             }
@@ -811,10 +845,11 @@ public class Fragment_Home extends Fragment {
 
                 int page = currentPageCategory + 1;
                 if (page <= totalPageCategory) {
+
                     spinnerCategoryListingModelList.add(null);
                     spinnerCategoryAdapter.notifyItemInserted(spinnerCategoryListingModelList.size() - 1);
-                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),100);
-
+                    dialogSpinnerCategoryBinding.recView.postDelayed(() -> dialogSpinnerCategoryBinding.recView.smoothScrollToPosition(spinnerCategoryListingModelList.size()-1),500);
+                    isLoadingCategory = true;
                     loadMoreCategoryListing(page);
                 }else
                 {
@@ -861,6 +896,30 @@ public class Fragment_Home extends Fragment {
     }
 
 
+    public void setSearchData(int category_id,int location_id,String cat_name,String loc_name,String query)
+    {
+        this.category_id = category_id;
+        this.location_id = location_id;
+        this.cat_name = cat_name;
+        this.loc_name = loc_name;
+        this.query = query;
+
+        if (!cat_name.isEmpty())
+        {
+            binding.tvSpinnerCategory.setText(cat_name);
+        }
+
+        if (!loc_name.isEmpty())
+        {
+            binding.tvSpinnerLocation.setText(loc_name);
+        }
+
+        if (!query.isEmpty())
+        {
+            binding.edtQuery.setText(query);
+        }
+
+    }
 
     public void setCategoryData(SpinnerModel spinnerModel, int adapterPosition) {
         if (adapterPosition!=0)
@@ -928,31 +987,29 @@ public class Fragment_Home extends Fragment {
 
         Intent intent = new Intent(activity, BusinessDetailsActivity.class);
         intent.putExtra("web_id",String.valueOf(slide.getWeb_id()));
-        intent.putExtra("from",1);
         startActivity(intent);
     }
 
     public void setFeatureListingData(FeatureListingDataModel.FeatureModel featureModel) {
         Intent intent = new Intent(activity, BusinessDetailsActivity.class);
         intent.putExtra("web_id",String.valueOf(featureModel.getWeb_id()));
-        intent.putExtra("from",1);
         startActivity(intent);
     }
 
     public void setItemDataFeatureCategory(FeaturedCategoryDataModel.FeaturedCategoryModel featuredCategoryModel) {
 
         Log.e("web_id",featuredCategoryModel.getWeb_id()+"_");
-        activity.DisplayFragmentDirectory(1, "", Integer.parseInt(featuredCategoryModel.getWeb_id()), 0,"","");
+        activity.DisplayFragmentDirectory(1, "", Integer.parseInt(featuredCategoryModel.getWeb_id()), 0,featuredCategoryModel.getName(),"");
+        setSearchData(Integer.parseInt(featuredCategoryModel.getWeb_id()), 0,featuredCategoryModel.getName(),"","");
 
-       /* Intent intent = new Intent(activity, BusinessDetailsActivity.class);
-        intent.putExtra("web_id",String.valueOf(featuredCategoryModel.getWeb_id()));
-        intent.putExtra("from",2);
-        startActivity(intent);*/
     }
 
     public void setItemDataIndustrialArea(IndustrialAreaDataModel.IndustrialAreaModel industrialAreaModel) {
 
-        activity.DisplayFragmentDirectory(1, "", Integer.parseInt(industrialAreaModel.getWeb_id()), 0,"","");
+
+        activity.DisplayFragmentDirectory(1, "", 0, Integer.parseInt(industrialAreaModel.getWeb_id()),"",industrialAreaModel.getName());
+
+        setSearchData(0, Integer.parseInt(industrialAreaModel.getWeb_id()),"",industrialAreaModel.getName(),"");
 
 
        /* Intent intent = new Intent(activity, BusinessDetailsActivity.class);

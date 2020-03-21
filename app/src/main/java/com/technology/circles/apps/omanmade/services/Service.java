@@ -9,12 +9,10 @@ import com.technology.circles.apps.omanmade.models.FeatureListingDataModel;
 import com.technology.circles.apps.omanmade.models.FeaturedCategoryDataModel;
 import com.technology.circles.apps.omanmade.models.IndustrialAreaDataModel;
 import com.technology.circles.apps.omanmade.models.MediaModel;
-import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.models.PackageDataModel;
-import com.technology.circles.apps.omanmade.models.PlaceGeocodeData;
-import com.technology.circles.apps.omanmade.models.PlaceMapDetailsData;
 import com.technology.circles.apps.omanmade.models.ServiceDataModel;
 import com.technology.circles.apps.omanmade.models.SliderModel;
+import com.technology.circles.apps.omanmade.models.SpinnerModel;
 import com.technology.circles.apps.omanmade.models.SponsorsModel;
 
 import java.util.List;
@@ -33,18 +31,7 @@ import retrofit2.http.QueryMap;
 
 public interface Service {
 
-    @GET("place/findplacefromtext/json")
-    Call<PlaceMapDetailsData> searchOnMap(@Query(value = "inputtype") String inputtype,
-                                          @Query(value = "input") String input,
-                                          @Query(value = "fields") String fields,
-                                          @Query(value = "language") String language,
-                                          @Query(value = "key") String key
-    );
 
-    @GET("geocode/json")
-    Call<PlaceGeocodeData> getGeoData(@Query(value = "latlng") String latlng,
-                                      @Query(value = "language") String language,
-                                      @Query(value = "key") String key);
 
     @GET("api/settings")
     Call<AppDataModel> getSetting(@Header("lang") String lang);
@@ -86,7 +73,7 @@ public interface Service {
     Call<List<SpinnerModel>> getLocation(@Query("parent") int lang);
 
     @GET("wp-json/wp/v2/listing_categories")
-    Call<List<SpinnerModel>> getListingCategory(@Query("page") int page);
+    Call<List<SpinnerModel>> getListingCategory(@Query("page") int page,@Query("parent") int lang);
 
 
     @GET("api/dir-ads")

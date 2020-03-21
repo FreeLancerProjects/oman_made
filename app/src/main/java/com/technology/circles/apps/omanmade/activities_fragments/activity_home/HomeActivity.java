@@ -791,6 +791,14 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public void setSearchData(int category_id,int location_id,String cat_name,String loc_name,String query)
+    {
+        if (fragment_home!=null&&fragment_home.isAdded())
+        {
+            fragment_home.setSearchData(category_id,location_id,cat_name,loc_name,query);
+        }
+    }
+
 
     public void RefreshActivity(String lang) {
         Paper.book().write("lang", lang);
